@@ -559,11 +559,12 @@ bit_constexpr T bit_ceil_impl( T x, std11::true_type /*case: same type*/)
 }
 
 template< class T >
-bit_constexpr T bit_ceil_impl( T x, std11::false_type /*case: integral promotion*/ )
+bit_constexpr14 T bit_ceil_impl( T x, std11::false_type /*case: integral promotion*/ )
 {
-    bit_constexpr int offset_for_ub = std::numeric_limits<unsigned>::digits - std::numeric_limits<T>::digits;
+    bit_constexpr T offset_for_ub =
+        static_cast<T>( std::numeric_limits<unsigned>::digits - std::numeric_limits<T>::digits );
 
-#if bit_CPP11_OR_GREATER
+#if 0 // bit_CPP14_OR_GREATER
     return T{ 1u << ( bit_width(T{x - 1}) + offset_for_ub ) >> offset_for_ub };
 #else
     return T( 1u << ( bit_width(T(x - 1)) + offset_for_ub ) >> offset_for_ub );
