@@ -161,10 +161,13 @@ namespace nonstd
 #define bit_HAVE_IS_TRIVIALLY_COPYABLE  bit_CPP11_110
 #define bit_HAVE_IS_COPY_CONSTRUCTIBLE  bit_CPP11_110
 #define bit_HAVE_IS_MOVE_CONSTRUCTIBLE  bit_CPP11_110
-#define bit_HAVE_IS_UNSIGNED            bit_CPP11_90
 
 #define bit_HAVE_TYPE_TRAITS            bit_CPP11_90
 #define bit_HAVE_TR1_TYPE_TRAITS        (!! bit_COMPILER_GNUC_VERSION )
+
+#define bit_HAVE_IS_UNSIGNED            bit_HAVE_TYPE_TRAITS
+#define bit_HAVE_IS_SAME                bit_HAVE_TYPE_TRAITS
+#define bit_HAVE_IS_SAME_TR1            bit_HAVE_TR1_TYPE_TRAITS
 
 // Presence of C++14 language features:
 
@@ -287,6 +290,15 @@ typedef integral_constant< bool, false > false_type;
     template< class T > struct is_unsigned : std11::true_type{};
 #endif
 
+#if bit_HAVE( IS_SAME )
+    using std::is_same;
+#elif bit_HAVE( IS_SAME_TR1 )
+    using std::tr1::is_same;
+#else
+    template< class T > struct is_unsigned : std11::true_type{};
+#endif
+
+
 // namespace detail
 // {
 //     template< typename T, bool = std::is_arithmetic<T>::value >
@@ -301,6 +313,12 @@ typedef integral_constant< bool, false > false_type;
 
 } // namepsace std11
 
+namespace std20 {
+
+template< class T, class U >
+struct same_as : std11::integral_constant<bool, std11::is_same<T,U>::value && std11::is_same<U,T>::value> {};
+
+}
 //
 // For reference:
 //
@@ -526,6 +544,30 @@ bit_constexpr T bit_width(T x) bit_noexcept
     return static_cast<T>(std::numeric_limits<T>::digits - countl_zero(x) );
 }
 
+template< class T >
+bit_constexpr T bit_ceil_impl( T x, std11::true_type /*case: same type*/)
+{
+#if bit_CPP11_OR_GREATER
+    return T{1} << bit_width( T{x - 1} );
+#else
+    return T(1) << bit_width( T(x - 1) );
+#endif
+}
+
+template< class T >
+bit_constexpr T bit_ceil_impl( T x, std11::false_type /*case: integral promotion*/ )
+{
+    bit_constexpr int offset_for_ub = std::numeric_limits<unsigned>::digits - std::numeric_limits<T>::digits;
+
+#if bit_CPP11_OR_GREATER
+    return T{ 1u << ( bit_width(T{x - 1}) + offset_for_ub ) >> offset_for_ub };
+#else
+    return T( 1u << ( bit_width(T(x - 1)) + offset_for_ub ) >> offset_for_ub );
+#endif
+}
+
+// ToDo: pre-C++11 behaviour for types subject to integral promotion.
+
 template< class T
     bit_ENABLE_IF_(
         std11::is_unsigned<T>::value
@@ -533,17 +575,12 @@ template< class T
 >
 bit_constexpr T bit_ceil(T x)
 {
-    return false;
-
-    // if (x <= 1u)
-    //     return T(1);
-    // if constexpr (std::same_as<T, decltype(+x)>)
-    //     return T(1) << std::bit_width(T(x - 1));
-    // else { // for types subject to integral promotion
-    //     constexpr int offset_for_ub =
-    //         std::numeric_limits<unsigned>::digits - std::numeric_limits<T>::digits;
-    //     return T(1u << (std::bit_width(T(x - 1)) + offset_for_ub) >> offset_for_ub);
-    // }
+    return ( x <= 1u )
+#if bit_CPP11_OR_GREATER
+        ? T{1} : bit_ceil_impl( x, std20::same_as<T, decltype(+x)>{} );
+#else
+        ? T(1) : bit_ceil_impl( x, std11::true_type() );
+#endif
 }
 
 template< class T
