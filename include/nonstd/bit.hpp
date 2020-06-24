@@ -238,7 +238,7 @@ namespace nonstd
 namespace nonstd {
 namespace bit {
 
-/// for bit_ENABLE_IF_
+// for bit_ENABLE_IF_():
 
 /*enum*/ class enabler{};
 
@@ -313,12 +313,15 @@ typedef integral_constant< bool, false > false_type;
 
 } // namepsace std11
 
+// C++20 emulation:
+
 namespace std20 {
 
 template< class T, class U >
 struct same_as : std11::integral_constant<bool, std11::is_same<T,U>::value && std11::is_same<U,T>::value> {};
 
-}
+} // namepsace std20
+
 //
 // For reference:
 //
