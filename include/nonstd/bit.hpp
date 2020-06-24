@@ -296,7 +296,7 @@ typedef integral_constant< bool, false > false_type;
 #elif bit_HAVE( IS_SAME_TR1 )
     using std::tr1::is_same;
 #else
-    template< class T > struct is_same : std11::true_type{};
+    template< class T, class U > struct is_same : std11::true_type{};
 #endif
 
 
