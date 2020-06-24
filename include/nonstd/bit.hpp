@@ -208,9 +208,9 @@ namespace nonstd
 // Method enabling:
 
 #if bit_HAVE( TYPE_TRAITS )
-#  define bit_ENABLE_IF_(R, VA)  typename std::enable_if< (VA), R >::type
+# define bit_ENABLE_IF_(R, VA)  typename std::enable_if< (VA), R >::type
 #else
-# define  bit_ENABLE_IF_(R, VA)  R
+# define bit_ENABLE_IF_(R, VA)  R
 #endif
 
 namespace nonstd {
@@ -332,7 +332,7 @@ public:
     friend inline bool operator!=( endian a, endian b ) { return a.value != b.value; }
 
 private:
-    int value;
+    endian_ value;
 };
 
 #endif
