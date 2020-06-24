@@ -73,7 +73,7 @@ using nonstd::bit::bitmask;
 CASE( "has_single_bit: single bit yields true for single bits set" )
 {
     typedef unsigned long type;
-    const int N = 8 * sizeof(type);
+    const int N = CHAR_BIT * sizeof(type);
 
     for( int i = 0; i < N; ++i )
     {
@@ -85,7 +85,7 @@ CASE( "has_single_bit: single bit yields true for single bits set" )
 CASE( "has_single_bit: single bit yields false for mutiple bits set" )
 {
     typedef unsigned long type;
-    const int N = 8 * sizeof(type);
+    const int N = CHAR_BIT * sizeof(type);
 
     for( int i = 0; i < N; ++i )
     {

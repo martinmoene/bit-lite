@@ -206,6 +206,7 @@ namespace nonstd
 // Additional includes:
 
 #include <cstring>      // std::memcpy()
+#include <climits>      // CHAR_BIT
 #include <limits>       // std::numeric_limits<>
 
 #if bit_HAVE_TYPE_TRAITS
@@ -441,7 +442,7 @@ template< class T
 >
 bit_constexpr14 int countl_zero(T x) bit_noexcept
 {
-    bit_constexpr14 int N1 = 8 * sizeof(T) - 1;
+    bit_constexpr14 int N1 = CHAR_BIT * sizeof(T) - 1;
 
     int result = 0;
     for( int i = N1; i >= 0; --i, ++result )
@@ -459,7 +460,7 @@ template< class T
 >
 bit_constexpr14 int countl_one(T x) bit_noexcept
 {
-    bit_constexpr14 int N1 = 8 * sizeof(T) - 1;
+    bit_constexpr14 int N1 = CHAR_BIT * sizeof(T) - 1;
 
     int result = 0;
     for( int i = N1; i >= 0; --i, ++result )
@@ -477,7 +478,7 @@ template< class T
 >
 bit_constexpr14 int countr_zero(T x) bit_noexcept
 {
-    bit_constexpr14 int N = 8 * sizeof(T);
+    bit_constexpr14 int N = CHAR_BIT * sizeof(T);
 
     int result = 0;
     for( int i = 0; i < N; ++i, ++result )
@@ -495,7 +496,7 @@ template< class T
 >
 bit_constexpr14 int countr_one(T x) bit_noexcept
 {
-    bit_constexpr14 int N = 8 * sizeof(T);
+    bit_constexpr14 int N = CHAR_BIT * sizeof(T);
 
     int result = 0;
     for( int i = 0; i < N; ++i, ++result )
@@ -513,7 +514,7 @@ template< class T
 >
 bit_constexpr14 int popcount(T x) bit_noexcept
 {
-    bit_constexpr14 int N = 8 * sizeof(T);
+    bit_constexpr14 int N = CHAR_BIT * sizeof(T);
 
     int result = 0;
     for( int i = 0; i < N; ++i )
