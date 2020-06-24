@@ -17,9 +17,9 @@
     namespace std11 { typedef unsigned long long uint64_t; }
 #endif
 
-namespace lest {
+namespace nonstd { namespace bit {
 
-inline std::string to_string( nonstd::endian const & e )
+inline std::string to_string( endian const & e )
 {
     using nonstd::endian;
 
@@ -33,11 +33,11 @@ inline std::string to_string( nonstd::endian const & e )
         return "[??? endian]";
 }
 
-inline std::ostream & operator<<( std::ostream & os, nonstd::endian const & e )
+inline std::ostream & operator<<( std::ostream & os, endian const & e )
 {
     return os << to_string( e );
 }
-} // namespace lest
+}} // namespace nonstd::bit
 
 using namespace nonstd;
 
@@ -49,7 +49,7 @@ using namespace nonstd;
 
 #define no_constexpr /*constexpr*/
 
-CASE( "bit_cast: ..." )
+CASE( "bit_cast<>(): ..." )
 {
     no_constexpr double f64v = 19880124.0;
     no_constexpr ::std11::uint64_t u64v = nonstd::bit_cast< ::std11::uint64_t >(f64v);
@@ -70,7 +70,7 @@ CASE( "bit_cast: ..." )
 
 using nonstd::bit::bitmask;
 
-CASE( "has_single_bit: single bit yields true for single bits set" )
+CASE( "has_single_bit(): single bit yields true for single bits set" )
 {
     typedef unsigned long type;
     const int N = CHAR_BIT * sizeof(type);
@@ -82,7 +82,7 @@ CASE( "has_single_bit: single bit yields true for single bits set" )
     }
 }
 
-CASE( "has_single_bit: single bit yields false for mutiple bits set" )
+CASE( "has_single_bit(): single bit yields false for mutiple bits set" )
 {
     typedef unsigned long type;
     const int N = CHAR_BIT * sizeof(type);
@@ -98,9 +98,9 @@ CASE( "has_single_bit: single bit yields false for mutiple bits set" )
 
 #include <bitset>
 
-CASE( "bit_ceil: implement" )
+CASE( "bit_ceil(): implement" )
 {
-    EXPECT( !!"bit_ceil: implement" );
+    EXPECT( !!"bit_ceil(): implement" );
 
     typedef std::bitset<8> bin;
 
@@ -116,9 +116,9 @@ CASE( "bit_ceil: implement" )
     }
 }
 
-CASE( "bit_floor: implement" )
+CASE( "bit_floor(): implement" )
 {
-    EXPECT( !!"bit_floor: implement" );
+    EXPECT( !!"bit_floor(): implement" );
 
     typedef std::bitset<8> bin;
 
@@ -136,7 +136,7 @@ CASE( "bit_floor: implement" )
 
 CASE( "bit_width: implement" )
 {
-    EXPECT( !!"bit_width: implement" );
+    EXPECT( !!"bit_width()(): implement" );
 
     for (unsigned x = 0; x != 8; ++x)
     {
@@ -151,9 +151,9 @@ CASE( "bit_width: implement" )
     }
 }
 
-CASE( "rotl: implement" )
+CASE( "rotl(): implement" )
 {
-    EXPECT( !!"rotl: implement" );
+    EXPECT( !!"rotl(): implement" );
 
     typedef unsigned char uint8_t;
     uint8_t i = 29; // 0b00011101;
@@ -165,9 +165,9 @@ CASE( "rotl: implement" )
     std::cout << "rotl(i,-1) = " << std::bitset<8>(nonstd::rotl(i,-1)) << '\n';
 }
 
-CASE( "rotr: implement" )
+CASE( "rotr(): implement" )
 {
-    EXPECT( !!"rotr: implement" );
+    EXPECT( !!"rotr(): implement" );
 
     typedef unsigned char uint8_t;
     uint8_t i = 29; // 0b00011101;
@@ -178,9 +178,9 @@ CASE( "rotr: implement" )
     std::cout << "rotr(i,-1) = " << std::bitset<8>(nonstd::rotr(i,-1)) << '\n';
 }
 
-CASE( "countl_zero: implement" )
+CASE( "countl_zero(): implement" )
 {
-    EXPECT( !!"countl_zero: implement" );
+    EXPECT( !!"countl_zero(): implement" );
 
     typedef unsigned char type;
     type table[] = { 0u, 255u, 28u };
@@ -195,9 +195,9 @@ CASE( "countl_zero: implement" )
     }
 }
 
-CASE( "countl_one: implement" )
+CASE( "countl_one(): implement" )
 {
-    EXPECT( !!"countl_one: implement" );
+    EXPECT( !!"countl_one(): implement" );
 
     typedef unsigned char type;
     type table[] = { 0u, 255u, 227u };
@@ -211,9 +211,9 @@ CASE( "countl_one: implement" )
     }
 }
 
-CASE( "countr_zero: implement" )
+CASE( "countr_zero(): implement" )
 {
-    EXPECT( !!"countr_zero: implement" );
+    EXPECT( !!"countr_zero(): implement" );
 
     typedef unsigned char type;
     type table[] = { 0u, 255u, 28u };
@@ -228,9 +228,9 @@ CASE( "countr_zero: implement" )
     }
 }
 
-CASE( "countr_one: implement" )
+CASE( "countr_one(): implement" )
 {
-    EXPECT( !!"countr_one: implement" );
+    EXPECT( !!"countr_one(): implement" );
 
     // for (std::uint8_t i : { 0, 0b11111111, 0b11100011 })
 
@@ -247,9 +247,9 @@ CASE( "countr_one: implement" )
     }
 }
 
-CASE( "popcount: implement" )
+CASE( "popcount(): implement" )
 {
-    EXPECT( !!"popcount: implement" );
+    EXPECT( !!"popcount(): implement" );
 
     // for (std::uint8_t i : { 0, 0b11111111, 0b00011101 })
 
