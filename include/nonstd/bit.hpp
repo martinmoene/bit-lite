@@ -90,6 +90,9 @@ namespace nonstd
 
 #else // bit_USES_STD_BIT
 
+// half-open range [lo..hi):
+#define bit_BETWEEN( v, lo, hi ) ( (lo) <= (v) && (v) < (hi) )
+
 // Compiler versions:
 //
 // MSVC++  6.0  _MSC_VER == 1200  bit_COMPILER_MSVC_VERSION ==  60  (Visual Studio 6.0)
@@ -150,6 +153,7 @@ namespace nonstd
 #define bit_HAVE_CONSTEXPR_11           bit_CPP11_140
 #define bit_HAVE_ENUM_CLASS             bit_CPP11_110
 #define bit_HAVE_NOEXCEPT               bit_CPP11_140
+#define bit_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  bit_CPP11_120
 
 // Presence of C++11 library features:
 
@@ -157,6 +161,7 @@ namespace nonstd
 #define bit_HAVE_IS_TRIVIALLY_COPYABLE  bit_CPP11_110
 #define bit_HAVE_IS_COPY_CONSTRUCTIBLE  bit_CPP11_110
 #define bit_HAVE_IS_MOVE_CONSTRUCTIBLE  bit_CPP11_110
+#define bit_HAVE_IS_UNSIGNED            bit_CPP11_90
 
 #define bit_HAVE_TYPE_TRAITS            bit_CPP11_90
 #define bit_HAVE_TR1_TYPE_TRAITS        (!! bit_COMPILER_GNUC_VERSION )
@@ -198,6 +203,7 @@ namespace nonstd
 // Additional includes:
 
 #include <cstring>      // std::memcpy()
+#include <limits>       // std::numeric_limits<>
 
 #if bit_HAVE_TYPE_TRAITS
 # include <type_traits>
@@ -205,15 +211,43 @@ namespace nonstd
 # include <tr1/type_traits>
 #endif
 
-// Method enabling:
+// Method enabling (return type):
 
 #if bit_HAVE( TYPE_TRAITS )
-# define bit_ENABLE_IF_(R, VA)  typename std::enable_if< (VA), R >::type
+# define bit_ENABLE_IF_R_(R, VA)  typename std::enable_if< (VA), R >::type
 #else
-# define bit_ENABLE_IF_(R, VA)  R
+# define bit_ENABLE_IF_R_(R, VA)  R
+#endif
+
+// Method enabling (funtion template argument):
+
+#if bit_HAVE( TYPE_TRAITS ) && bit_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
+// VS 2013 seems to have trouble with SFINAE for default non-type arguments:
+# if !bit_BETWEEN( bit_COMPILER_MSVC_VERSION, 1, 140 )
+#  define bit_ENABLE_IF_(VA) , typename std::enable_if< ( VA ), int >::type = 0
+# else
+#  define bit_ENABLE_IF_(VA) , typename = typename std::enable_if< ( VA ), ::nonstd::bit::enabler >::type
+# endif
+#else
+# define  bit_ENABLE_IF_(VA)
 #endif
 
 namespace nonstd {
+namespace bit {
+
+/// for bit_ENABLE_IF_
+
+/*enum*/ class enabler{};
+
+template< typename T >
+bit_constexpr T bitmask( int i )
+{
+#if bit_CPP11_OR_GREATER
+    return static_cast<T>( T{1} << i );
+#else
+    return static_cast<T>( T(1) << i );
+#endif
+}
 
 // C++11 emulation:
 
@@ -247,7 +281,61 @@ typedef integral_constant< bool, false > false_type;
     template< class T > struct is_move_constructible : std11::true_type{};
 #endif
 
+#if bit_HAVE( IS_UNSIGNED )
+    using std::is_unsigned;
+#else
+    template< class T > struct is_unsigned : std11::true_type{};
+#endif
+
+// namespace detail
+// {
+//     template< typename T, bool = std::is_arithmetic<T>::value >
+//     struct is_unsigned : std::integral_constant<bool, T(0) < T(-1)> {};
+
+//     template< typename T >
+//     struct is_unsigned<T,false> : std::false_type {};
+// } // namespace detail
+
+// template< typename T >
+// struct is_unsigned : detail::is_unsigned<T>::type {};
+
 } // namepsace std11
+
+//
+// For reference:
+//
+
+#if 0
+
+// 26.5.3, bit_cast
+
+template< class To, class From > constexpr To bit_cast( From const & from ) noexcept;
+
+// 26.5.4, integral powers of 2
+
+template< class T > constexpr bool has_single_bit(T x) noexcept;
+template< class T > constexpr T bit_ceil(T x);
+template< class T > constexpr T bit_floor(T x) noexcept;
+template< class T > constexpr T bit_width(T x) noexcept;
+
+// 26.5.5, rotating
+
+template< class T > [[nodiscard]] constexpr T rotl(T x, int s) noexcept;
+template< class T > [[nodiscard]] constexpr T rotr(T x, int s) noexcept;
+
+// 26.5.6, counting
+
+template< class T > constexpr int countl_zero(T x) noexcept;
+template< class T > constexpr int countl_one(T x) noexcept;
+template< class T > constexpr int countr_zero(T x) noexcept;
+template< class T > constexpr int countr_one(T x) noexcept;
+template< class T > constexpr int popcount(T x) noexcept;
+
+#endif // 0: For reference
+
+//
+// Implementation:
+//
 
 // 26.5.3, bit_cast
 
@@ -255,7 +343,7 @@ typedef integral_constant< bool, false > false_type;
 
 template< class To, class From >
 /*constexpr*/
-bit_ENABLE_IF_(
+bit_ENABLE_IF_R_(
     To,
     ( (sizeof(To) == sizeof(From))
         && std11::is_trivially_copyable<From>::value
@@ -270,25 +358,209 @@ bit_cast( From const & src ) bit_noexcept
     return dst;
 }
 
-// 26.5.4, integral powers of 2
-
-template< class T > bit_constexpr bool has_single_bit(T x) bit_noexcept;
-template< class T > bit_constexpr T bit_ceil(T x);
-template< class T > bit_constexpr T bit_floor(T x) bit_noexcept;
-template< class T > bit_constexpr T bit_width(T x) bit_noexcept;
-
 // 26.5.5, rotating
 
-template< class T > bit_nodiscard bit_constexpr T rotl(T x, int s) bit_noexcept;
-template< class T > bit_nodiscard bit_constexpr T rotr(T x, int s) bit_noexcept;
+template< class T >
+bit_nodiscard bit_constexpr14 T rotr_impl(T x, int s) bit_noexcept;
+
+template< class T >
+bit_nodiscard bit_constexpr14 T rotl_impl(T x, int s) bit_noexcept
+{
+    bit_constexpr14 int N = std::numeric_limits<T>::digits;
+    const int r = s % N;
+
+    if ( r == 0 )
+        return x;
+    else if ( r > 0 )
+        return static_cast<T>( (x << r) | (x >> (N - r)) );
+    else /*if ( r < 0 )*/
+        return rotr_impl( x, -r );
+}
+
+template< class T >
+bit_nodiscard bit_constexpr14 T rotr_impl(T x, int s) bit_noexcept
+{
+    bit_constexpr14 int N = std::numeric_limits<T>::digits;
+    const int r = s % N;
+
+    if ( r == 0 )
+        return x;
+    else if ( r > 0 )
+        return static_cast<T>( (x >> r) | (x << (N - r)) );
+    else /*if ( r < 0 )*/
+        return rotl_impl( x, -r );
+}
+
+template< class T
+    bit_ENABLE_IF_(
+        std11::is_unsigned<T>::value
+    )
+>
+bit_nodiscard bit_constexpr14 T rotl(T x, int s) bit_noexcept
+{
+    return rotl_impl( x, s );
+}
+
+template< class T
+    bit_ENABLE_IF_(
+        std11::is_unsigned<T>::value
+    )
+>
+bit_nodiscard bit_constexpr14 T rotr(T x, int s) bit_noexcept
+{
+    return rotr_impl( x, s );
+}
 
 // 26.5.6, counting
 
-template< class T > bit_constexpr int countl_zero(T x) bit_noexcept;
-template< class T > bit_constexpr int countl_one(T x) bit_noexcept;
-template< class T > bit_constexpr int countr_zero(T x) bit_noexcept;
-template< class T > bit_constexpr int countr_one(T x) bit_noexcept;
-template< class T > bit_constexpr int popcount(T x) bit_noexcept;
+template< class T
+    bit_ENABLE_IF_(
+        std11::is_unsigned<T>::value
+    )
+>
+bit_constexpr14 int countl_zero(T x) bit_noexcept
+{
+    bit_constexpr14 int N1 = 8 * sizeof(T) - 1;
+
+    int result = 0;
+    for( int i = N1; i >= 0; --i, ++result )
+    {
+        if ( 0 != (x & bitmask<T>(i)) )
+            break;
+    }
+    return result;
+}
+
+template< class T
+    bit_ENABLE_IF_(
+        std11::is_unsigned<T>::value
+    )
+>
+bit_constexpr14 int countl_one(T x) bit_noexcept
+{
+    bit_constexpr14 int N1 = 8 * sizeof(T) - 1;
+
+    int result = 0;
+    for( int i = N1; i >= 0; --i, ++result )
+    {
+        if ( 0 == (x & bitmask<T>(i)) )
+            break;
+    }
+    return result;
+}
+
+template< class T
+    bit_ENABLE_IF_(
+        std11::is_unsigned<T>::value
+    )
+>
+bit_constexpr14 int countr_zero(T x) bit_noexcept
+{
+    bit_constexpr14 int N = 8 * sizeof(T);
+
+    int result = 0;
+    for( int i = 0; i < N; ++i, ++result )
+    {
+        if ( 0 != (x & bitmask<T>(i)) )
+            break;
+    }
+    return result;
+}
+
+template< class T
+    bit_ENABLE_IF_(
+        std11::is_unsigned<T>::value
+    )
+>
+bit_constexpr14 int countr_one(T x) bit_noexcept
+{
+    bit_constexpr14 int N = 8 * sizeof(T);
+
+    int result = 0;
+    for( int i = 0; i < N; ++i, ++result )
+    {
+        if ( 0 == (x & bitmask<T>(i)) )
+            break;
+    }
+    return result;
+}
+
+template< class T
+    bit_ENABLE_IF_(
+        std11::is_unsigned<T>::value
+    )
+>
+bit_constexpr14 int popcount(T x) bit_noexcept
+{
+    bit_constexpr14 int N = 8 * sizeof(T);
+
+    int result = 0;
+    for( int i = 0; i < N; ++i )
+    {
+        if ( 0 != (x & bitmask<T>(i)) )
+            ++result;
+    }
+    return result;
+}
+
+// 26.5.4, integral powers of 2
+
+template< class T
+    bit_ENABLE_IF_(
+        std11::is_unsigned<T>::value
+    )
+>
+bit_constexpr bool has_single_bit(T x) bit_noexcept
+{
+    return x != 0 && ( x & (x - 1) ) == 0;
+    // return std::popcount(x) == 1;
+}
+
+template< class T
+    bit_ENABLE_IF_(
+        std11::is_unsigned<T>::value
+    )
+>
+bit_constexpr T bit_width(T x) bit_noexcept
+{
+    return static_cast<T>(std::numeric_limits<T>::digits - countl_zero(x) );
+}
+
+template< class T
+    bit_ENABLE_IF_(
+        std11::is_unsigned<T>::value
+    )
+>
+bit_constexpr T bit_ceil(T x)
+{
+    return false;
+
+    // if (x <= 1u)
+    //     return T(1);
+    // if constexpr (std::same_as<T, decltype(+x)>)
+    //     return T(1) << std::bit_width(T(x - 1));
+    // else { // for types subject to integral promotion
+    //     constexpr int offset_for_ub =
+    //         std::numeric_limits<unsigned>::digits - std::numeric_limits<T>::digits;
+    //     return T(1u << (std::bit_width(T(x - 1)) + offset_for_ub) >> offset_for_ub);
+    // }
+}
+
+template< class T
+    bit_ENABLE_IF_(
+        std11::is_unsigned<T>::value
+    )
+>
+bit_constexpr T bit_floor(T x) bit_noexcept
+{
+    return (x != 0)
+#if bit_CPP11_OR_GREATER
+        ? T{1} << (bit_width(x) - 1)
+#else
+        ? T(1) << (bit_width(x) - 1)
+#endif
+        : 0;
+}
 
 // 26.5.7, endian
 
@@ -337,7 +609,31 @@ private:
 
 #endif
 
+} // namespace bit
 } // namespace nonstd
+
+// Make type available in namespace nonstd:
+
+namespace nonstd
+{
+    using bit::bit_cast;
+
+    using bit::has_single_bit;
+    using bit::bit_ceil;
+    using bit::bit_floor;
+    using bit::bit_width;
+
+    using bit::rotl;
+    using bit::rotr;
+
+    using bit::countl_zero;
+    using bit::countl_one;
+    using bit::countr_zero;
+    using bit::countr_one;
+    using bit::popcount;
+
+    using bit::endian;
+}
 
 #endif // bit_USES_STD_BIT
 
