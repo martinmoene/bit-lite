@@ -8,6 +8,7 @@
 
 #include "bit-main.t.hpp"
 
+#include <climits>      // CHAR_BIT, when bit_USES_STD_BIT
 #include <iostream>
 
 #if bit_CPP11_90
@@ -17,7 +18,11 @@
     namespace std11 { typedef unsigned long long uint64_t; }
 #endif
 
+#if bit_USES_STD_BIT
+namespace std {
+#else
 namespace nonstd { namespace bit {
+#endif
 
 inline std::string to_string( endian const & e )
 {
@@ -37,7 +42,18 @@ inline std::ostream & operator<<( std::ostream & os, endian const & e )
 {
     return os << to_string( e );
 }
+
+#if bit_USES_STD_BIT
+} // namespace std
+#else
 }} // namespace nonstd::bit
+#endif
+
+template< typename T >
+inline T bitmask( int i )
+{
+    return static_cast<T>( T(1) << i );
+}
 
 using namespace nonstd;
 
@@ -67,8 +83,6 @@ CASE( "bit_cast<>(): ..." )
 
     EXPECT( true );
 }
-
-using nonstd::bit::bitmask;
 
 CASE( "has_single_bit(): single bit yields true for single bits set" )
 {
@@ -108,7 +122,7 @@ CASE( "bit_ceil(): implement" )
     {
         unsigned const z = nonstd::bit_ceil(x); // `ceil2` before P1956R1
 
-#if bit_BETWEEN( bit_COMPILER_MSVC_VER, 1, 1700 )
+#if defined(_MSC_VER) && _MSC_VER < 1700
         std::cout << "bit_ceil(" << bin(int(x)) << ") = " << bin(int(z)) << '\n';
 #else
         std::cout << "bit_ceil(" << bin(x) << ") = " << bin(z) << '\n';
@@ -126,7 +140,7 @@ CASE( "bit_floor(): implement" )
     {
         unsigned const z = nonstd::bit_floor(x); // `floor2` before P1956R1
 
-#if bit_BETWEEN( bit_COMPILER_MSVC_VER, 1, 1700 )
+#if defined(_MSC_VER) && _MSC_VER < 1700
         std::cout << "bit_floor(" << bin(int(x)) << ") = " << bin(int(z)) << '\n';
 #else
         std::cout << "bit_floor(" << bin(x) << ") = " << bin(z) << '\n';
@@ -142,7 +156,7 @@ CASE( "bit_width: implement" )
     {
         std::cout
             << "bit_width( "
-#if bit_BETWEEN( bit_COMPILER_MSVC_VER, 1, 1700 )
+#if defined(_MSC_VER) && _MSC_VER < 1700
             << std::bitset<4>(int(x)) << " ) = "
 #else
             << std::bitset<4>(x) << " ) = "
@@ -277,7 +291,9 @@ CASE( "endian: little differs from big (corner-case when all scalars have size o
 
 CASE( "to_big_endian(): [extension]" )
 {
-#if bit_CONFIG_STRICT
+#if bit_USES_STD_BIT
+    EXPECT( !!"Extension to_big_endian() not available (bit_USES_STD_BIT)" );
+#elif bit_CONFIG_STRICT
     EXPECT( !!"Extension to_big_endian() not available (bit_CONFIG_STRICT)" );
 #else
     std::cout << "to_big_endian(0xabcd) => " << std::showbase << std::hex << to_big_endian(0xabcdU) << std::dec << '\n';
@@ -288,7 +304,9 @@ CASE( "to_big_endian(): [extension]" )
 
 CASE( "to_little_endian(): [extension]" )
 {
-#if bit_CONFIG_STRICT
+#if bit_USES_STD_BIT
+    EXPECT( !!"Extension to_little_endian() not available (bit_USES_STD_BIT)" );
+#elif bit_CONFIG_STRICT
     EXPECT( !!"Extension to_little_endian() not available (bit_CONFIG_STRICT)" );
 #else
     std::cout << "to_little_endian(0xabcd) => " << std::showbase << std::hex << to_little_endian(0xabcdU) << std::dec << '\n';
@@ -299,7 +317,9 @@ CASE( "to_little_endian(): [extension]" )
 
 CASE( "to_native_endian(): [extension]" )
 {
-#if bit_CONFIG_STRICT
+#if bit_USES_STD_BIT
+    EXPECT( !!"Extension to_native_endian() not available (bit_USES_STD_BIT)" );
+#elif bit_CONFIG_STRICT
     EXPECT( !!"Extension to_native_endian() not available (bit_CONFIG_STRICT)" );
 #else
     std::cout << "to_native_endian(0xabcd) => " << std::showbase << std::hex << to_native_endian(0xabcdU) << std::dec << '\n';
@@ -308,7 +328,9 @@ CASE( "to_native_endian(): [extension]" )
 
 CASE( "as_big_endian(): [extension]" )
 {
-#if bit_CONFIG_STRICT
+#if bit_USES_STD_BIT
+    EXPECT( !!"Extension as_big_endian() not available (bit_USES_STD_BIT)" );
+#elif bit_CONFIG_STRICT
     EXPECT( !!"Extension as_big_endian() not available (bit_CONFIG_STRICT)" );
 #else
     std::cout << "as_big_endian(0xabcd) => " << std::showbase << std::hex << as_big_endian(0xabcdU) << std::dec << '\n';
@@ -317,7 +339,9 @@ CASE( "as_big_endian(): [extension]" )
 
 CASE( "as_little_endian(): [extension]" )
 {
-#if bit_CONFIG_STRICT
+#if bit_USES_STD_BIT
+    EXPECT( !!"Extension as_little_endian() not available (bit_USES_STD_BIT)" );
+#elif bit_CONFIG_STRICT
     EXPECT( !!"Extension as_little_endian() not available (bit_CONFIG_STRICT)" );
 #else
     std::cout << "as_little_endian(0xabcd) => " << std::showbase << std::hex << as_little_endian(0xabcdU) << std::dec << '\n';
@@ -326,7 +350,9 @@ CASE( "as_little_endian(): [extension]" )
 
 CASE( "as_native_endian(): [extension]" )
 {
-#if bit_CONFIG_STRICT
+#if bit_USES_STD_BIT
+    EXPECT( !!"Extension as_native_endian() not available (bit_USES_STD_BIT)" );
+#elif bit_CONFIG_STRICT
     EXPECT( !!"Extension as_native_endian() not available (bit_CONFIG_STRICT)" );
 #else
     std::cout << "as_native_endian(0xabcd) => " << std::showbase << std::hex << as_native_endian(0xabcdU) << std::dec << '\n';
