@@ -28,6 +28,11 @@
 # define bit_CONFIG_SELECT_BIT  ( bit_HAVE_STD_BIT ? bit_BIT_STD : bit_BIT_NONSTD )
 #endif
 
+
+#if !defined( bit_CONFIG_STRICT )
+# define bit_CONFIG_STRICT  0
+#endif
+
 // C++ language version detection (C++20 is speculative):
 // Note: VC14.0/1900 (VS2015) lacks too much from C++14.
 
@@ -154,11 +159,12 @@ namespace nonstd
 #define bit_HAVE_ENUM_CLASS             bit_CPP11_110
 #define bit_HAVE_NOEXCEPT               bit_CPP11_140
 #define bit_HAVE_DEFAULT_FUNCTION_TEMPLATE_ARG  bit_CPP11_120
+#define bit_HAVE_STATIC_ASSERT          bit_CPP11_90
 
 // Presence of C++11 library features:
 
 #define bit_HAVE_IS_TRIVIAL             bit_CPP11_110
-#define bit_HAVE_IS_TRIVIALLY_COPYABLE  bit_CPP11_110 && !bit_BETWEEN(bit_COMPILER_GNUC_VERSION, 1, 500) // GCC > = 5
+#define bit_HAVE_IS_TRIVIALLY_COPYABLE  bit_CPP11_110 && !bit_BETWEEN(bit_COMPILER_GNUC_VERSION, 1, 500) // GCC >= 5
 #define bit_HAVE_IS_COPY_CONSTRUCTIBLE  bit_CPP11_110
 #define bit_HAVE_IS_MOVE_CONSTRUCTIBLE  bit_CPP11_110
 
@@ -168,6 +174,8 @@ namespace nonstd
 #define bit_HAVE_IS_UNSIGNED            bit_HAVE_TYPE_TRAITS
 #define bit_HAVE_IS_SAME                bit_HAVE_TYPE_TRAITS
 #define bit_HAVE_IS_SAME_TR1            bit_HAVE_TR1_TYPE_TRAITS
+
+#define bit_HAVE_CSTDINT                bit_CPP11_90
 
 // Presence of C++14 language features:
 
@@ -654,7 +662,192 @@ private:
 } // namespace bit
 } // namespace nonstd
 
+//
+// Extensions: endian conversions
+//
+
+#if !bit_CONFIG_STRICT
+
+#ifdef  _MSC_VER
+# include <cstdlib>
+# define bit_byteswap16  _byteswap_ushort
+# define bit_byteswap32  _byteswap_ulong
+# define bit_byteswap64  _byteswap_uint64
+#else
+# define bit_byteswap16  __builtin_bswap16
+# define bit_byteswap32  __builtin_bswap32
+# define bit_byteswap64  __builtin_bswap64
+#endif
+
+#if bit_HAVE( CSTDINT )
+# include <cstdint>
+#endif
+
+namespace nonstd {
+namespace bit {
+
+// endianness selection types:
+
+typedef std11::integral_constant<int, static_cast<int>(endian::big   )> is_big_endian_t;
+typedef std11::integral_constant<int, static_cast<int>(endian::little)> is_little_endian_t;
+typedef std11::integral_constant<int, static_cast<int>(endian::native)> is_native_endian_t;
+
+// make sure all unsigned types are covered, see
+// http://ithare.com/c-on-using-int_t-as-overload-and-template-parameters/
+
+namespace std11 {
+
+#if bit_HAVE( CSTDINT )
+    using std::uint8_t;
+    using std::uint16_t;
+    using std::uint32_t;
+    using std::uint64_t;
+#else
+    typedef unsigned char      uint8_t;
+    typedef unsigned short int uint16_t;
+    typedef unsigned int       uint32_t;
+    typedef unsigned long long uint64_t;
+#endif
+} // namespace std11
+
+template< size_t N > struct uint_by_size;
+template<> struct uint_by_size< 8> { typedef std11::uint8_t  type; };
+template<> struct uint_by_size<16> { typedef std11::uint16_t type; };
+template<> struct uint_by_size<32> { typedef std11::uint32_t type; };
+template<> struct uint_by_size<64> { typedef std11::uint64_t type; };
+
+template< typename T >
+struct normalized_uint_type
+{
+    typedef typename uint_by_size< CHAR_BIT * sizeof( T ) >::type type;
+
+#if bit_HAVE( STATIC_ASSERT )
+    static_assert( sizeof( type ) == sizeof( T ), "");
+    static_assert( std::is_integral<T>::value, "");
+    static_assert( std11::is_unsigned<type>::value, "");
+#endif
+};
+
+// to big endian (implementation):
+
+inline std11::uint8_t to_big_endian_( std11::uint8_t v, is_little_endian_t )
+{
+    return v;
+}
+
+inline std11::uint16_t to_big_endian_( std11::uint16_t v, is_little_endian_t )
+{
+    return bit_byteswap16( v );
+}
+
+inline std11::uint32_t to_big_endian_( std11::uint32_t v, is_little_endian_t )
+{
+    return bit_byteswap32( v );
+}
+
+inline std11::uint64_t to_big_endian_( std11::uint64_t v, is_little_endian_t )
+{
+    return bit_byteswap64( v );
+}
+
+template< typename T >
+inline T to_big_endian_( T v, is_big_endian_t )
+{
+    return v;
+}
+
+// to little endian (implementation):
+
+inline std11::uint8_t to_little_endian_( std11::uint8_t v, is_big_endian_t )
+{
+    return v;
+}
+
+inline std11::uint16_t to_little_endian_( std11::uint16_t v, is_big_endian_t )
+{
+    return bit_byteswap16( v );
+}
+
+inline std11::uint32_t to_little_endian_( std11::uint32_t v, is_big_endian_t )
+{
+    return bit_byteswap32( v );
+}
+
+inline std11::uint64_t to_little_endian_( std11::uint64_t v, is_big_endian_t )
+{
+    return bit_byteswap64( v );
+}
+
+template< typename T >
+inline T to_little_endian_( T v, is_little_endian_t )
+{
+    return v;
+}
+
+//
+// to_{endian}: convert unconditionally (default), or depending in given endianness.
+// Note: avoid C++11 default function template arguments.
+//
+
+template< typename T >
+inline T to_big_endian( T v, is_little_endian_t = is_little_endian_t() )
+{
+    return to_big_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), is_little_endian_t() );
+}
+
+template< typename T, typename EN >
+inline T to_big_endian( T v, EN )
+{
+    return to_big_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), EN() );
+}
+
+template< typename T >
+inline T to_little_endian( T v, is_big_endian_t = is_big_endian_t() )
+{
+    return to_little_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), is_big_endian_t() );
+}
+
+template< typename T, typename EN >
+inline T to_little_endian( T v, EN )
+{
+    return to_little_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), EN() );
+}
+
+template< typename T >
+inline T to_native_endian( T v, is_native_endian_t = is_native_endian_t() )
+{
+    return v;
+}
+
+//
+// as_{endian}: convert if different from is_native_endian_t.
+//
+
+template< typename T >
+inline T as_big_endian( T v )
+{
+    return to_big_endian( v, is_native_endian_t() );
+}
+
+template< typename T >
+inline T as_little_endian( T v )
+{
+    return to_little_endian( v, is_native_endian_t() );
+}
+
+template< typename T >
+inline T as_native_endian( T v )
+{
+    return to_native_endian( v, is_native_endian_t() );
+}
+
+}} // namespace nonstd::bit
+
+#endif // !bit_CONFIG_STRICT
+
+//
 // Make type available in namespace nonstd:
+//
 
 namespace nonstd
 {
@@ -676,6 +869,25 @@ namespace nonstd
 
     using bit::endian;
 }
+
+#if !bit_CONFIG_STRICT
+
+namespace nonstd
+{
+    using bit::is_big_endian_t;
+    using bit::is_little_endian_t;
+    using bit::is_native_endian_t;
+
+    using bit::to_big_endian;
+    using bit::to_little_endian;
+    using bit::to_native_endian;
+
+    using bit::as_big_endian;
+    using bit::as_little_endian;
+    using bit::as_native_endian;
+}
+
+#endif // !bit_CONFIG_STRICT
 
 #endif // bit_USES_STD_BIT
 

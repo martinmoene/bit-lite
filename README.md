@@ -71,7 +71,15 @@ Depending on the compiler and C++-standard used, the `nonstd/bit` behaves less o
 
 ### Non-standard extensions
 
-TBD
+- is_big_endian_t
+- is_little_endian_t
+- is_native_endian_t
+- to_big_endian()
+- to_little_endian()
+- to_native_endian()
+- as_big_endian()
+- as_little_endian()
+- as_native_endian()
 
 ### Configuration
 
@@ -84,6 +92,11 @@ At default, *bit lite* uses the C++20 standard header `<bit>` if it is available
 
 -D<b>bit\_CONFIG\_SELECT\_BIT</b>=bit_BIT_DEFAULT  
 Define this to `bit_BIT_STD` to select `std::bit` as `nonstd::bit`. Define this to `bit_BIT_NONSTD` to select `nonstd::bit` as `nonstd::bit`. Default is undefined, which has the same effect as defining to `bit_BIT_DEFAULT`.
+
+### Strict C++20 mode
+
+-D<b>bit\_CONFIG\_STRICT</b>=1
+Define this to `1` to omit the non C++20 standard extensions. Default is undefined, which has the same effect as `0`, non-strict mode.
 
 ## Reported to work with
 
@@ -131,4 +144,10 @@ countr_zero(): implement
 countr_one(): implement
 popcount(): implement
 endian: little differs from big (corner-case when all scalars have size of 1 byte)
+to_big_endian(): [extension]
+to_little_endian(): [extension]
+to_native_endian(): [extension]
+as_big_endian(): [extension]
+as_little_endian(): [extension]
+as_native_endian(): [extension]
 ```

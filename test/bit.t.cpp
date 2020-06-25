@@ -271,5 +271,67 @@ CASE( "endian: little differs from big (corner-case when all scalars have size o
     EXPECT( nonstd::endian::little != nonstd::endian::big );
 }
 
+//
+// Extensions: endian conversions
+//
+
+CASE( "to_big_endian(): [extension]" )
+{
+#if bit_CONFIG_STRICT
+    EXPECT( !!"Extension to_big_endian() not available (bit_CONFIG_STRICT)" );
+#else
+    std::cout << "to_big_endian(0xabcd) => " << std::showbase << std::hex << to_big_endian(0xabcdU) << std::dec << '\n';
+    std::cout << "to_big_endian(0xabcd, is_little_endian_t()) => " << std::showbase << std::hex << to_big_endian(0xabcdU, is_little_endian_t()) << std::dec << '\n';
+    std::cout << "to_big_endian(0xabcd, is_big_endian_t()) => " << std::showbase << std::hex << to_big_endian(0xabcdU, is_big_endian_t()) << std::dec << '\n';
+#endif
+}
+
+CASE( "to_little_endian(): [extension]" )
+{
+#if bit_CONFIG_STRICT
+    EXPECT( !!"Extension to_little_endian() not available (bit_CONFIG_STRICT)" );
+#else
+    std::cout << "to_little_endian(0xabcd) => " << std::showbase << std::hex << to_little_endian(0xabcdU) << std::dec << '\n';
+    std::cout << "to_little_endian(0xabcd, is_little_endian_t()) => " << std::showbase << std::hex << to_little_endian(0xabcdU, is_little_endian_t()) << std::dec << '\n';
+    std::cout << "to_little_endian(0xabcd, is_big_endian_t()) => " << std::showbase << std::hex << to_little_endian(0xabcdU, is_big_endian_t()) << std::dec << '\n';
+#endif
+}
+
+CASE( "to_native_endian(): [extension]" )
+{
+#if bit_CONFIG_STRICT
+    EXPECT( !!"Extension to_native_endian() not available (bit_CONFIG_STRICT)" );
+#else
+    std::cout << "to_native_endian(0xabcd) => " << std::showbase << std::hex << to_native_endian(0xabcdU) << std::dec << '\n';
+#endif
+}
+
+CASE( "as_big_endian(): [extension]" )
+{
+#if bit_CONFIG_STRICT
+    EXPECT( !!"Extension as_big_endian() not available (bit_CONFIG_STRICT)" );
+#else
+    std::cout << "as_big_endian(0xabcd) => " << std::showbase << std::hex << as_big_endian(0xabcdU) << std::dec << '\n';
+#endif
+}
+
+CASE( "as_little_endian(): [extension]" )
+{
+#if bit_CONFIG_STRICT
+    EXPECT( !!"Extension as_little_endian() not available (bit_CONFIG_STRICT)" );
+#else
+    std::cout << "as_little_endian(0xabcd) => " << std::showbase << std::hex << as_little_endian(0xabcdU) << std::dec << '\n';
+#endif
+}
+
+CASE( "as_native_endian(): [extension]" )
+{
+#if bit_CONFIG_STRICT
+    EXPECT( !!"Extension as_native_endian() not available (bit_CONFIG_STRICT)" );
+#else
+    std::cout << "as_native_endian(0xabcd) => " << std::showbase << std::hex << as_native_endian(0xabcdU) << std::dec << '\n';
+#endif
+}
+
 // g++ -std=c++11 -I../include -o bit.t.exe bit.t.cpp && bit.t.exe
 // cl -EHsc -I../include bit.t.cpp && bit.t.exe
