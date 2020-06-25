@@ -119,12 +119,37 @@ namespace nonstd
 # define bit_COMPILER_MSVC_VERSION  0
 #endif
 
+// Courtesy of https://github.com/gsl-lite/gsl-lite
+// AppleClang  7.0.0  __apple_build_version__ ==  7000172  bit_COMPILER_APPLECLANG_VERSION ==  700  (Xcode 7.0, 7.0.1)          (LLVM 3.7.0)
+// AppleClang  7.0.0  __apple_build_version__ ==  7000176  bit_COMPILER_APPLECLANG_VERSION ==  700  (Xcode 7.1)                 (LLVM 3.7.0)
+// AppleClang  7.0.2  __apple_build_version__ ==  7000181  bit_COMPILER_APPLECLANG_VERSION ==  702  (Xcode 7.2, 7.2.1)          (LLVM 3.7.0)
+// AppleClang  7.3.0  __apple_build_version__ ==  7030029  bit_COMPILER_APPLECLANG_VERSION ==  730  (Xcode 7.3)                 (LLVM 3.8.0)
+// AppleClang  7.3.0  __apple_build_version__ ==  7030031  bit_COMPILER_APPLECLANG_VERSION ==  730  (Xcode 7.3.1)               (LLVM 3.8.0)
+// AppleClang  8.0.0  __apple_build_version__ ==  8000038  bit_COMPILER_APPLECLANG_VERSION ==  800  (Xcode 8.0)                 (LLVM 3.9.0)
+// AppleClang  8.0.0  __apple_build_version__ ==  8000042  bit_COMPILER_APPLECLANG_VERSION ==  800  (Xcode 8.1, 8.2, 8.2.1)     (LLVM 3.9.0)
+// AppleClang  8.1.0  __apple_build_version__ ==  8020038  bit_COMPILER_APPLECLANG_VERSION ==  810  (Xcode 8.3)                 (LLVM 3.9.0)
+// AppleClang  8.1.0  __apple_build_version__ ==  8020041  bit_COMPILER_APPLECLANG_VERSION ==  810  (Xcode 8.3.1)               (LLVM 3.9.0)
+// AppleClang  8.1.0  __apple_build_version__ ==  8020042  bit_COMPILER_APPLECLANG_VERSION ==  810  (Xcode 8.3.2, 8.3.3)        (LLVM 3.9.0)
+// AppleClang  9.0.0  __apple_build_version__ ==  9000037  bit_COMPILER_APPLECLANG_VERSION ==  900  (Xcode 9.0)                 (LLVM 4.0.0?)
+// AppleClang  9.0.0  __apple_build_version__ ==  9000038  bit_COMPILER_APPLECLANG_VERSION ==  900  (Xcode 9.1)                 (LLVM 4.0.0?)
+// AppleClang  9.0.0  __apple_build_version__ ==  9000039  bit_COMPILER_APPLECLANG_VERSION ==  900  (Xcode 9.2)                 (LLVM 4.0.0?)
+// AppleClang  9.1.0  __apple_build_version__ ==  9020039  bit_COMPILER_APPLECLANG_VERSION ==  910  (Xcode 9.3, 9.3.1)          (LLVM 5.0.2?)
+// AppleClang  9.1.0  __apple_build_version__ ==  9020039  bit_COMPILER_APPLECLANG_VERSION ==  910  (Xcode 9.4, 9.4.1)          (LLVM 5.0.2?)
+// AppleClang 10.0.0  __apple_build_version__ == 10001145  bit_COMPILER_APPLECLANG_VERSION == 1000  (Xcode 10.0, 10.1)          (LLVM 6.0.1?)
+// AppleClang 10.0.1  __apple_build_version__ == 10010046  bit_COMPILER_APPLECLANG_VERSION == 1001  (Xcode 10.2, 10.2.1, 10.3)  (LLVM 7.0.0?)
+// AppleClang 11.0.0  __apple_build_version__ == 11000033  bit_COMPILER_APPLECLANG_VERSION == 1100  (Xcode 11.1, 11.2, 11.3)    (LLVM 8.0.0?)
+
 #define bit_COMPILER_VERSION( major, minor, patch )  ( 10 * ( 10 * (major) + (minor) ) + (patch) )
 
-#if defined(__clang__)
-# define bit_COMPILER_CLANG_VERSION  bit_COMPILER_VERSION(__clang_major__, __clang_minor__, __clang_patchlevel__)
+#if defined( __apple_build_version__ )
+# define bit_COMPILER_APPLECLANG_VERSION bit_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
+# define bit_COMPILER_CLANG_VERSION 0
+#elif defined( __clang__ )
+# define bit_COMPILER_APPLECLANG_VERSION 0
+# define bit_COMPILER_CLANG_VERSION bit_COMPILER_VERSION( __clang_major__, __clang_minor__, __clang_patchlevel__ )
 #else
-# define bit_COMPILER_CLANG_VERSION  0
+# define bit_COMPILER_APPLECLANG_VERSION 0
+# define bit_COMPILER_CLANG_VERSION 0
 #endif
 
 #if defined(__GNUC__) && !defined(__clang__)
@@ -392,7 +417,7 @@ bit_cast( From const & src ) bit_noexcept
 // clang 3.5 - 3.8: Infinite recursive template instantiation when using Clang while GCC works fine?
 // https://stackoverflow.com/questions/37931284/infinite-recursive-template-instantiation-when-using-clang-while-gcc-works-fine
 
-#if bit_BETWEEN( bit_COMPILER_CLANG_VERSION, 1, 390 )
+#if bit_BETWEEN( bit_COMPILER_CLANG_VERSION, 1, 390 ) || bit_BETWEEN( bit_COMPILER_APPLECLANG_VERSION, 1, 900 )
 # define bit_constexpr_rot  /*constexpr*/
 #else
 # define bit_constexpr_rot  bit_constexpr14
