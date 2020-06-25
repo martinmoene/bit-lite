@@ -9,7 +9,7 @@
 #include "bit-main.t.hpp"
 
 #define bit_PRESENT( x ) \
-    std::cout << #x << ": " << x << "\n"
+    std::cout << #x << ": " << (x) << "\n"
 
 #define bit_ABSENT( x ) \
     std::cout << #x << ": (undefined)\n"
