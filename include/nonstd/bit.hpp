@@ -158,7 +158,7 @@ namespace nonstd
 // Presence of C++11 library features:
 
 #define bit_HAVE_IS_TRIVIAL             bit_CPP11_110
-#define bit_HAVE_IS_TRIVIALLY_COPYABLE  bit_CPP11_110
+#define bit_HAVE_IS_TRIVIALLY_COPYABLE  bit_CPP11_110 && !bit_BETWEEN(bit_COMPILER_GNUC_VERSION, 1, 500) // GCC > = 5
 #define bit_HAVE_IS_COPY_CONSTRUCTIBLE  bit_CPP11_110
 #define bit_HAVE_IS_MOVE_CONSTRUCTIBLE  bit_CPP11_110
 
