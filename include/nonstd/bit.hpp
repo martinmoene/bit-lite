@@ -28,7 +28,6 @@
 # define bit_CONFIG_SELECT_BIT  ( bit_HAVE_STD_BIT ? bit_BIT_STD : bit_BIT_NONSTD )
 #endif
 
-
 #if !defined( bit_CONFIG_STRICT )
 # define bit_CONFIG_STRICT  0
 #endif

@@ -95,7 +95,7 @@ Define this to `bit_BIT_STD` to select `std::bit` as `nonstd::bit`. Define this 
 
 ### Strict C++20 mode
 
--D<b>bit\_CONFIG\_STRICT</b>=1
+-D<b>bit\_CONFIG\_STRICT</b>=1  
 Define this to `1` to omit the non C++20 standard extensions. Default is undefined, which has the same effect as `0`, non-strict mode.
 
 ## Reported to work with
