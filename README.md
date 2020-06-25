@@ -21,18 +21,24 @@
 
 ```Cpp
 #include "nonstd/bit.hpp"
+#include <iostream>
 
 using namespace nonstd;
 
 int main()
 {
+    std::cout
+        << "Consecutive ones at the right in 0x17: " << countr_one( 0x7u )
+        << "\nBit width of 0x13: " << bit_width( 0x13u ) << '\n';
 }
 ```
 
 ### Compile and run
 
 ```Text
-prompt> g++ -Wall -I../include -o 01-basic 01-basic.cpp && 01-basic
+prompt> g++ -Wall -I../include -o 01-basic.exe 01-basic.cpp && 01-basic.exe
+Consecutive ones at the right in 0x17: 3
+Bit width in 0x13: 5
 ```
 
 ## In a nutshell
@@ -61,25 +67,28 @@ prompt> g++ -Wall -I../include -o 01-basic 01-basic.cpp && 01-basic
 
 **Contents**  
 
-[Documentation of `std::bit`](#documentation-of-stdbit)  
+[Documentation of standard header `<bit>`](#documentation-of-stdbit)  
 [Non-standard extensions](#non-standard-extensions)  
 [Configuration](#configuration)  
 
 ### Documentation of standard header `<bit>`
 
-Depending on the compiler and C++-standard used, the `nonstd/bit` behaves less or more like `std::bit`. To get an idea of the capabilities of `nonstd::bit` with your configuration, look at the output of the [tests](test/bit.t.cpp), issuing `bit-main.t --pass @`. For `std::bit`, see its [documentation at cppreference](https://en.cppreference.com/w/cpp/header/bit).  
+Depending on the compiler and C++-standard used, *bit lite* behaves less or more like C++20 standard `<bit>`. To get an idea of the capabilities of *bit lite* with your configuration, look at the output of the [tests](test/bit.t.cpp), issuing `bit-main.t --pass @`. For C++20 standard `<bit>`, see its [documentation at cppreference](https://en.cppreference.com/w/cpp/header/bit).  
 
 ### Non-standard extensions
 
-- is_big_endian_t
-- is_little_endian_t
-- is_native_endian_t
-- to_big_endian()
-- to_little_endian()
-- to_native_endian()
-- as_big_endian()
-- as_little_endian()
-- as_native_endian()
+| Kind               | Extension type or function |
+|--------------------|----------------------------|
+| **Type**           | **is_big_endian_t**        |
+| &nbsp;             | **is_little_endian_t**     |
+| &nbsp;             | **is_native_endian_t**     |
+| &nbsp;             | &nbsp; |
+| **Free function**  | template&lt;class T><br>T **to_big_endian**(T v) |
+| &nbsp;             | template&lt;class T, class EN ><br>T **to_big_endian**(T v, EN) |
+| &nbsp;             | template&lt;class T ><br>T **to_little_endian**(T v) |
+| &nbsp;             | template&lt;class T, class EN ><br>T **to_little_endian**(T v, EN) |
+| &nbsp;             | template&lt;class T ><br>T **to_native_endian**(T v) |
+| &nbsp;             | template&lt;class T, class EN ><br>T** to_native_endian**(T v, EN) |
 
 ### Configuration
 
@@ -91,7 +100,7 @@ Define this macro to override the auto-detection of the supported C++ standard, 
 At default, *bit lite* uses the C++20 standard header `<bit>` if it is available and lets you use it via namespace `nonstd`. You can however override this default and explicitly request to use the standard C++20 header or *bit lite*'s header via the following macros.
 
 -D<b>bit\_CONFIG\_SELECT\_BIT</b>=bit_BIT_DEFAULT  
-Define this to `bit_BIT_STD` to select `std::bit` as `nonstd::bit`. Define this to `bit_BIT_NONSTD` to select `nonstd::bit` as `nonstd::bit`. Default is undefined, which has the same effect as defining to `bit_BIT_DEFAULT`.
+Define this to `bit_BIT_STD` to select C++20 standard header `<bit>`. Define this to `bit_BIT_NONSTD` to select *bit lite*. Default is undefined, which has the same effect as defining to `bit_BIT_DEFAULT`.
 
 ### Strict C++20 mode
 
@@ -104,7 +113,11 @@ TBD
 
 ## Building the tests
 
+TBD
+
 ## Other implementations of `<bit>`
+
+TBD
 
 ## Notes and references
 
