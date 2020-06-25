@@ -392,11 +392,17 @@ bit_cast( From const & src ) bit_noexcept
 // clang 3.5 - 3.8: Infinite recursive template instantiation when using Clang while GCC works fine?
 // https://stackoverflow.com/questions/37931284/infinite-recursive-template-instantiation-when-using-clang-while-gcc-works-fine
 
-template< class T >
-bit_nodiscard bit_constexpr14 T rotr_impl(T x, int s) bit_noexcept;
+#if bit_BETWEEN( bit_COMPILER_CLANG_VERSION, 1, 390 )
+# define bit_constexpr_rot  /*constexpr*/
+#else
+# define bit_constexpr_rot  bit_constexpr14
+#endif
 
 template< class T >
-bit_nodiscard bit_constexpr14 T rotl_impl(T x, int s) bit_noexcept
+bit_nodiscard bit_constexpr_rot T rotr_impl(T x, int s) bit_noexcept;
+
+template< class T >
+bit_nodiscard bit_constexpr_rot T rotl_impl(T x, int s) bit_noexcept
 {
     bit_constexpr14 int N = std::numeric_limits<T>::digits;
     const int r = s % N;
@@ -406,11 +412,11 @@ bit_nodiscard bit_constexpr14 T rotl_impl(T x, int s) bit_noexcept
     else if ( r > 0 )
         return static_cast<T>( (x << r) | (x >> (N - r)) );
     else /*if ( r < 0 )*/
-        return rotr_impl<T>( x, -r );
+        return rotr_impl( x, -r );
 }
 
 template< class T >
-bit_nodiscard bit_constexpr14 T rotr_impl(T x, int s) bit_noexcept
+bit_nodiscard bit_constexpr_rot T rotr_impl(T x, int s) bit_noexcept
 {
     bit_constexpr14 int N = std::numeric_limits<T>::digits;
     const int r = s % N;
@@ -420,7 +426,7 @@ bit_nodiscard bit_constexpr14 T rotr_impl(T x, int s) bit_noexcept
     else if ( r > 0 )
         return static_cast<T>( (x >> r) | (x << (N - r)) );
     else /*if ( r < 0 )*/
-        return rotl_impl<T>( x, -r );
+        return rotl_impl( x, -r );
 }
 
 template< class T
@@ -430,7 +436,7 @@ template< class T
 >
 bit_nodiscard bit_constexpr14 T rotl(T x, int s) bit_noexcept
 {
-    return rotl_impl<T>( x, s );
+    return rotl_impl( x, s );
 }
 
 template< class T
@@ -440,7 +446,7 @@ template< class T
 >
 bit_nodiscard bit_constexpr14 T rotr(T x, int s) bit_noexcept
 {
-    return rotr_impl<T>( x, s );
+    return rotr_impl( x, s );
 }
 
 // 26.5.6, counting
