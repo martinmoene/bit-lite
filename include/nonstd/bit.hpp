@@ -331,19 +331,6 @@ typedef integral_constant< bool, false > false_type;
     template< class T, class U > struct is_same : std11::true_type{};
 #endif
 
-
-// namespace detail
-// {
-//     template< typename T, bool = std::is_arithmetic<T>::value >
-//     struct is_unsigned : std::integral_constant<bool, T(0) < T(-1)> {};
-
-//     template< typename T >
-//     struct is_unsigned<T,false> : std::false_type {};
-// } // namespace detail
-
-// template< typename T >
-// struct is_unsigned : detail::is_unsigned<T>::type {};
-
 } // namepsace std11
 
 // C++20 emulation:
@@ -817,13 +804,28 @@ inline T to_little_endian_( T v, is_little_endian_t )
     return v;
 }
 
+// to native endian (implementation):
+
+template< typename T >
+inline T to_native_endian_( T v, is_native_endian_t )
+{
+    return v;
+}
+
+template< typename T, typename EN >
+inline T to_native_endian_( T v, EN )
+{
+    // force conversion:
+    return to_big_endian_( v, is_little_endian_t() );
+}
+
 //
 // to_{endian}: convert unconditionally (default), or depending in given endianness.
 // Note: avoid C++11 default function template arguments.
 //
 
 template< typename T >
-inline T to_big_endian( T v, is_little_endian_t = is_little_endian_t() )
+inline T to_big_endian( T v )
 {
     return to_big_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), is_little_endian_t() );
 }
@@ -835,7 +837,7 @@ inline T to_big_endian( T v, EN )
 }
 
 template< typename T >
-inline T to_little_endian( T v, is_big_endian_t = is_big_endian_t() )
+inline T to_little_endian( T v )
 {
     return to_little_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), is_big_endian_t() );
 }
@@ -847,9 +849,15 @@ inline T to_little_endian( T v, EN )
 }
 
 template< typename T >
-inline T to_native_endian( T v, is_native_endian_t = is_native_endian_t() )
+inline T to_native_endian( T v )
 {
-    return v;
+    return to_native_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), is_native_endian_t() );
+}
+
+template< typename T, typename EN >
+inline T to_native_endian( T v, EN )
+{
+    return to_native_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), EN() );
 }
 
 //

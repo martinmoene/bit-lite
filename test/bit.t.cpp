@@ -323,6 +323,8 @@ CASE( "to_native_endian(): [extension]" )
     EXPECT( !!"Extension to_native_endian() not available (bit_CONFIG_STRICT)" );
 #else
     std::cout << "to_native_endian(0xabcd) => " << std::showbase << std::hex << to_native_endian(0xabcdU) << std::dec << '\n';
+    std::cout << "to_native_endian(0xabcd, is_little_endian_t()) => " << std::showbase << std::hex << to_native_endian(0xabcdU, is_little_endian_t()) << std::dec << '\n';
+    std::cout << "to_native_endian(0xabcd, is_big_endian_t()) => " << std::showbase << std::hex << to_native_endian(0xabcdU, is_big_endian_t()) << std::dec << '\n';
 #endif
 }
 
