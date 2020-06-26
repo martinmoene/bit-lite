@@ -98,9 +98,11 @@ CASE( "has_single_bit(): single bit yields false for mutiple bits set" " [bit.po
 
     for( int i = 0; i < N; ++i )
     {
-        if ( i != N-i )
+        const int Ni1 = N-i-1;
+
+        if ( i != Ni1 )
         {
-            EXPECT_NOT( has_single_bit( static_cast<type>(bitmask<type>(i) | bitmask<type>(N-i-1)) ) );
+            EXPECT_NOT( has_single_bit( static_cast<type>(bitmask<type>(i) | bitmask<type>(Ni1)) ) );
         }
     }
 }
@@ -278,6 +280,7 @@ CASE( "to_big_endian(): " " [bit.endian.extension]" )
     std::cout << "to_big_endian(0xabcd, little_endian_type()) => " << std::showbase << std::hex << to_big_endian(0xabcdU, little_endian_type()) << std::dec << '\n';
     std::cout << "to_big_endian(0xabcd, big_endian_type()) => " << std::showbase << std::hex << to_big_endian(0xabcdU, big_endian_type()) << std::dec << '\n';
 #endif
+
 }
 
 CASE( "to_little_endian(): " " [bit.endian.extension]" )
