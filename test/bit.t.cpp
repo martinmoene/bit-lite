@@ -297,8 +297,8 @@ CASE( "to_big_endian(): [extension]" )
     EXPECT( !!"Extension to_big_endian() not available (bit_CONFIG_STRICT)" );
 #else
     std::cout << "to_big_endian(0xabcd) => " << std::showbase << std::hex << to_big_endian(0xabcdU) << std::dec << '\n';
-    std::cout << "to_big_endian(0xabcd, is_little_endian_t()) => " << std::showbase << std::hex << to_big_endian(0xabcdU, is_little_endian_t()) << std::dec << '\n';
-    std::cout << "to_big_endian(0xabcd, is_big_endian_t()) => " << std::showbase << std::hex << to_big_endian(0xabcdU, is_big_endian_t()) << std::dec << '\n';
+    std::cout << "to_big_endian(0xabcd, little_endian_type()) => " << std::showbase << std::hex << to_big_endian(0xabcdU, little_endian_type()) << std::dec << '\n';
+    std::cout << "to_big_endian(0xabcd, big_endian_type()) => " << std::showbase << std::hex << to_big_endian(0xabcdU, big_endian_type()) << std::dec << '\n';
 #endif
 }
 
@@ -310,8 +310,8 @@ CASE( "to_little_endian(): [extension]" )
     EXPECT( !!"Extension to_little_endian() not available (bit_CONFIG_STRICT)" );
 #else
     std::cout << "to_little_endian(0xabcd) => " << std::showbase << std::hex << to_little_endian(0xabcdU) << std::dec << '\n';
-    std::cout << "to_little_endian(0xabcd, is_little_endian_t()) => " << std::showbase << std::hex << to_little_endian(0xabcdU, is_little_endian_t()) << std::dec << '\n';
-    std::cout << "to_little_endian(0xabcd, is_big_endian_t()) => " << std::showbase << std::hex << to_little_endian(0xabcdU, is_big_endian_t()) << std::dec << '\n';
+    std::cout << "to_little_endian(0xabcd, little_endian_type()) => " << std::showbase << std::hex << to_little_endian(0xabcdU, little_endian_type()) << std::dec << '\n';
+    std::cout << "to_little_endian(0xabcd, big_endian_type()) => " << std::showbase << std::hex << to_little_endian(0xabcdU, big_endian_type()) << std::dec << '\n';
 #endif
 }
 
@@ -323,8 +323,8 @@ CASE( "to_native_endian(): [extension]" )
     EXPECT( !!"Extension to_native_endian() not available (bit_CONFIG_STRICT)" );
 #else
     std::cout << "to_native_endian(0xabcd) => " << std::showbase << std::hex << to_native_endian(0xabcdU) << std::dec << '\n';
-    std::cout << "to_native_endian(0xabcd, is_little_endian_t()) => " << std::showbase << std::hex << to_native_endian(0xabcdU, is_little_endian_t()) << std::dec << '\n';
-    std::cout << "to_native_endian(0xabcd, is_big_endian_t()) => " << std::showbase << std::hex << to_native_endian(0xabcdU, is_big_endian_t()) << std::dec << '\n';
+    std::cout << "to_native_endian(0xabcd, little_endian_type()) => " << std::showbase << std::hex << to_native_endian(0xabcdU, little_endian_type()) << std::dec << '\n';
+    std::cout << "to_native_endian(0xabcd, big_endian_type()) => " << std::showbase << std::hex << to_native_endian(0xabcdU, big_endian_type()) << std::dec << '\n';
 #endif
 }
 

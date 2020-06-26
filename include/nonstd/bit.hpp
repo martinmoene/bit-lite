@@ -708,9 +708,9 @@ namespace bit {
 
 // endianness selection types:
 
-typedef std11::integral_constant<int, static_cast<int>(endian::big   )> is_big_endian_t;
-typedef std11::integral_constant<int, static_cast<int>(endian::little)> is_little_endian_t;
-typedef std11::integral_constant<int, static_cast<int>(endian::native)> is_native_endian_t;
+typedef std11::integral_constant<int, static_cast<int>(endian::big   )> big_endian_type;
+typedef std11::integral_constant<int, static_cast<int>(endian::little)> little_endian_type;
+typedef std11::integral_constant<int, static_cast<int>(endian::native)> native_endian_type;
 
 // make sure all unsigned types are covered, see
 // http://ithare.com/c-on-using-int_t-as-overload-and-template-parameters/
@@ -750,56 +750,56 @@ struct normalized_uint_type
 
 // to big endian (implementation):
 
-inline std11::uint8_t to_big_endian_( std11::uint8_t v, is_little_endian_t )
+inline std11::uint8_t to_big_endian_( std11::uint8_t v, little_endian_type )
 {
     return v;
 }
 
-inline std11::uint16_t to_big_endian_( std11::uint16_t v, is_little_endian_t )
+inline std11::uint16_t to_big_endian_( std11::uint16_t v, little_endian_type )
 {
     return bit_byteswap16( v );
 }
 
-inline std11::uint32_t to_big_endian_( std11::uint32_t v, is_little_endian_t )
+inline std11::uint32_t to_big_endian_( std11::uint32_t v, little_endian_type )
 {
     return bit_byteswap32( v );
 }
 
-inline std11::uint64_t to_big_endian_( std11::uint64_t v, is_little_endian_t )
+inline std11::uint64_t to_big_endian_( std11::uint64_t v, little_endian_type )
 {
     return bit_byteswap64( v );
 }
 
 template< typename T >
-inline T to_big_endian_( T v, is_big_endian_t )
+inline T to_big_endian_( T v, big_endian_type )
 {
     return v;
 }
 
 // to little endian (implementation):
 
-inline std11::uint8_t to_little_endian_( std11::uint8_t v, is_big_endian_t )
+inline std11::uint8_t to_little_endian_( std11::uint8_t v, big_endian_type )
 {
     return v;
 }
 
-inline std11::uint16_t to_little_endian_( std11::uint16_t v, is_big_endian_t )
+inline std11::uint16_t to_little_endian_( std11::uint16_t v, big_endian_type )
 {
     return bit_byteswap16( v );
 }
 
-inline std11::uint32_t to_little_endian_( std11::uint32_t v, is_big_endian_t )
+inline std11::uint32_t to_little_endian_( std11::uint32_t v, big_endian_type )
 {
     return bit_byteswap32( v );
 }
 
-inline std11::uint64_t to_little_endian_( std11::uint64_t v, is_big_endian_t )
+inline std11::uint64_t to_little_endian_( std11::uint64_t v, big_endian_type )
 {
     return bit_byteswap64( v );
 }
 
 template< typename T >
-inline T to_little_endian_( T v, is_little_endian_t )
+inline T to_little_endian_( T v, little_endian_type )
 {
     return v;
 }
@@ -807,7 +807,7 @@ inline T to_little_endian_( T v, is_little_endian_t )
 // to native endian (implementation):
 
 template< typename T >
-inline T to_native_endian_( T v, is_native_endian_t )
+inline T to_native_endian_( T v, native_endian_type )
 {
     return v;
 }
@@ -816,7 +816,7 @@ template< typename T, typename EN >
 inline T to_native_endian_( T v, EN )
 {
     // force conversion:
-    return to_big_endian_( v, is_little_endian_t() );
+    return to_big_endian_( v, little_endian_type() );
 }
 
 //
@@ -827,7 +827,7 @@ inline T to_native_endian_( T v, EN )
 template< typename T >
 inline T to_big_endian( T v )
 {
-    return to_big_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), is_little_endian_t() );
+    return to_big_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), little_endian_type() );
 }
 
 template< typename T, typename EN >
@@ -839,7 +839,7 @@ inline T to_big_endian( T v, EN )
 template< typename T >
 inline T to_little_endian( T v )
 {
-    return to_little_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), is_big_endian_t() );
+    return to_little_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), big_endian_type() );
 }
 
 template< typename T, typename EN >
@@ -851,7 +851,7 @@ inline T to_little_endian( T v, EN )
 template< typename T >
 inline T to_native_endian( T v )
 {
-    return to_native_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), is_native_endian_t() );
+    return to_native_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), native_endian_type() );
 }
 
 template< typename T, typename EN >
@@ -861,25 +861,25 @@ inline T to_native_endian( T v, EN )
 }
 
 //
-// as_{endian}: convert if different from is_native_endian_t.
+// as_{endian}: convert if different from native_endian_type.
 //
 
 template< typename T >
 inline T as_big_endian( T v )
 {
-    return to_big_endian( v, is_native_endian_t() );
+    return to_big_endian( v, native_endian_type() );
 }
 
 template< typename T >
 inline T as_little_endian( T v )
 {
-    return to_little_endian( v, is_native_endian_t() );
+    return to_little_endian( v, native_endian_type() );
 }
 
 template< typename T >
 inline T as_native_endian( T v )
 {
-    return to_native_endian( v, is_native_endian_t() );
+    return to_native_endian( v, native_endian_type() );
 }
 
 }} // namespace nonstd::bit
@@ -915,9 +915,9 @@ namespace nonstd
 
 namespace nonstd
 {
-    using bit::is_big_endian_t;
-    using bit::is_little_endian_t;
-    using bit::is_native_endian_t;
+    using bit::big_endian_type;
+    using bit::little_endian_type;
+    using bit::native_endian_type;
 
     using bit::to_big_endian;
     using bit::to_little_endian;
