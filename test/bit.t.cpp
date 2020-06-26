@@ -11,6 +11,8 @@
 #include <climits>      // CHAR_BIT, when bit_USES_STD_BIT
 #include <iostream>
 
+#define dimension_of(a)  ( sizeof(a) / sizeof(0[a]) )
+
 #if bit_CPP11_90
 # include <cstdint>
     namespace std11 { using std::uint64_t; }
@@ -65,26 +67,19 @@ using namespace nonstd;
 
 #define no_constexpr /*constexpr*/
 
-CASE( "bit_cast<>(): ..." )
+CASE( "bit_cast<>(): succesfully roundtrips uint64_t via double" " [bit.cast]" )
 {
-    no_constexpr double f64v = 19880124.0;
-    no_constexpr ::std11::uint64_t u64v = nonstd::bit_cast< ::std11::uint64_t >(f64v);
+    const std11::uint64_t v = 0x3fe9000000000000ull;
 
-    no_constexpr ::std11::uint64_t u64v2 = 0x3fe9000000000000ull;
-    no_constexpr double  f64v2 = nonstd::bit_cast<double>(u64v2);
-
-    std::cout
-        << std::fixed << f64v << ": f64.to_bits() == 0x"
-        << std::hex   << u64v << ": u64\n" << std::dec;
-
-    std::cout
-        << std::hex   << "f64::from_bits(0x" << u64v2 << "u64) == " << std::dec
-        << std::fixed << f64v2 << "f64\n";
-
-    EXPECT( true );
+    EXPECT( v == bit_cast<std11::uint64_t>( bit_cast<double>(v) ) );
 }
 
-CASE( "has_single_bit(): single bit yields true for single bits set" )
+CASE( "has_single_bit(): single bit yields false for no bits set" " [bit.pow.two]" )
+{
+    EXPECT_NOT( has_single_bit( 0u ) );
+}
+
+CASE( "has_single_bit(): single bit yields true for single bits set" " [bit.pow.two]" )
 {
     typedef unsigned long type;
     const int N = CHAR_BIT * sizeof(type);
@@ -96,7 +91,7 @@ CASE( "has_single_bit(): single bit yields true for single bits set" )
     }
 }
 
-CASE( "has_single_bit(): single bit yields false for mutiple bits set" )
+CASE( "has_single_bit(): single bit yields false for mutiple bits set" " [bit.pow.two]" )
 {
     typedef unsigned long type;
     const int N = CHAR_BIT * sizeof(type);
@@ -112,175 +107,158 @@ CASE( "has_single_bit(): single bit yields false for mutiple bits set" )
 
 #include <bitset>
 
-CASE( "bit_ceil(): implement" )
+CASE( "bit_ceil(): let N be the smallest power of 2 greater than or equal to x" " [bit.pow.two]" )
 {
-    EXPECT( !!"bit_ceil(): implement" );
-
     typedef std::bitset<8> bin;
 
-    for (unsigned x = 0; x != 10; ++x)
-    {
-        unsigned const z = nonstd::bit_ceil(x); // `ceil2` before P1956R1
-
-#if defined(_MSC_VER) && _MSC_VER < 1700
-        std::cout << "bit_ceil(" << bin(int(x)) << ") = " << bin(int(z)) << '\n';
-#else
-        std::cout << "bit_ceil(" << bin(x) << ") = " << bin(z) << '\n';
-#endif
-    }
+    EXPECT( bin( 1u ) == bin( bit_ceil( 0u ) ) );
+    EXPECT( bin( 1u ) == bin( bit_ceil( 1u ) ) );
+    EXPECT( bin( 2u ) == bin( bit_ceil( 2u ) ) );
+    EXPECT( bin( 4u ) == bin( bit_ceil( 3u ) ) );
+    EXPECT( bin( 4u ) == bin( bit_ceil( 4u ) ) );
+    EXPECT( bin( 8u ) == bin( bit_ceil( 5u ) ) );
+    EXPECT( bin( 8u ) == bin( bit_ceil( 6u ) ) );
+    EXPECT( bin( 8u ) == bin( bit_ceil( 7u ) ) );
+    EXPECT( bin( 8u ) == bin( bit_ceil( 8u ) ) );
+    EXPECT( bin(16u ) == bin( bit_ceil( 9u ) ) );
 }
 
-CASE( "bit_floor(): implement" )
+CASE( "bit_floor(): x == 0, 0; otherwise the maximal value y such that has_single_bit(y) is true and y <= x" " [bit.pow.two]" )
 {
-    EXPECT( !!"bit_floor(): implement" );
-
     typedef std::bitset<8> bin;
 
-    for (unsigned x = 0; x != 10; ++x)
-    {
-        unsigned const z = nonstd::bit_floor(x); // `floor2` before P1956R1
-
-#if defined(_MSC_VER) && _MSC_VER < 1700
-        std::cout << "bit_floor(" << bin(int(x)) << ") = " << bin(int(z)) << '\n';
-#else
-        std::cout << "bit_floor(" << bin(x) << ") = " << bin(z) << '\n';
-#endif
-    }
+    EXPECT( bin( 0u ) == bin( bit_floor( 0u ) ) );
+    EXPECT( bin( 1u ) == bin( bit_floor( 1u ) ) );
+    EXPECT( bin( 2u ) == bin( bit_floor( 2u ) ) );
+    EXPECT( bin( 2u ) == bin( bit_floor( 3u ) ) );
+    EXPECT( bin( 4u ) == bin( bit_floor( 4u ) ) );
+    EXPECT( bin( 4u ) == bin( bit_floor( 5u ) ) );
+    EXPECT( bin( 4u ) == bin( bit_floor( 6u ) ) );
+    EXPECT( bin( 4u ) == bin( bit_floor( 7u ) ) );
+    EXPECT( bin( 8u ) == bin( bit_floor( 8u ) ) );
+    EXPECT( bin( 8u ) == bin( bit_floor( 9u ) ) );
 }
 
-CASE( "bit_width: implement" )
+CASE( "bit_width: x == 0, 0; otherwise one plus the base-2 logarithm of x, with any fractional part discarded" " [bit.pow.two]" )
 {
-    EXPECT( !!"bit_width()(): implement" );
+    typedef std::bitset<8> bin;
 
-    for (unsigned x = 0; x != 8; ++x)
-    {
-        std::cout
-            << "bit_width( "
-#if defined(_MSC_VER) && _MSC_VER < 1700
-            << std::bitset<4>(int(x)) << " ) = "
-#else
-            << std::bitset<4>(x) << " ) = "
-#endif
-            << nonstd::bit_width(x) << '\n';
-    }
+    EXPECT( bit_width( 0u ) == 0 );
+    EXPECT( bit_width( 1u ) == 1 );
+    EXPECT( bit_width( 2u ) == 2 );
+    EXPECT( bit_width( 3u ) == 2 );
+    EXPECT( bit_width( 4u ) == 3 );
+    EXPECT( bit_width( 5u ) == 3 );
+    EXPECT( bit_width( 6u ) == 3 );
+    EXPECT( bit_width( 7u ) == 3 );
+    EXPECT( bit_width( 8u ) == 4 );
 }
 
-CASE( "rotl(): implement" )
+CASE( "rotl(): r is 0, x; if r is positive, (x << r) | (x >> (N - r)); if r is negative, rotr(x, -r)" " [bit.rotate]" )
 {
-    EXPECT( !!"rotl(): implement" );
-
+    typedef std::bitset<8> bin;
     typedef unsigned char uint8_t;
     uint8_t i = 29; // 0b00011101;
-    std::cout << "i          = " << std::bitset<8>(i) << '\n';
-    std::cout << "rotl(i,0)  = " << std::bitset<8>(nonstd::rotl(i,0)) << '\n';
-    std::cout << "rotl(i,1)  = " << std::bitset<8>(nonstd::rotl(i,1)) << '\n';
-    std::cout << "rotl(i,4)  = " << std::bitset<8>(nonstd::rotl(i,4)) << '\n';
-    std::cout << "rotl(i,9)  = " << std::bitset<8>(nonstd::rotl(i,9)) << '\n';
-    std::cout << "rotl(i,-1) = " << std::bitset<8>(nonstd::rotl(i,-1)) << '\n';
+
+    EXPECT( bin(      i     ) == bin(  i) );
+    EXPECT( bin( rotl(i, 0) ) == bin( 29) );
+    EXPECT( bin( rotl(i, 1) ) == bin( 58) );
+    EXPECT( bin( rotl(i, 4) ) == bin(209) );
+    EXPECT( bin( rotl(i, 9) ) == bin( 58) );
+    EXPECT( bin( rotl(i,-1) ) == bin(142) );
 }
 
-CASE( "rotr(): implement" )
+CASE( "rotr(): r is 0, x; if r is positive, (x >> r) | (x << (N - r)); if r is negative, rotl(x, -r)" " [bit.rotate]" )
 {
-    EXPECT( !!"rotr(): implement" );
-
+    typedef std::bitset<8> bin;
     typedef unsigned char uint8_t;
     uint8_t i = 29; // 0b00011101;
-    std::cout << "i          = " << std::bitset<8>(i) << '\n';
-    std::cout << "rotr(i,0)  = " << std::bitset<8>(nonstd::rotr(i,0)) << '\n';
-    std::cout << "rotr(i,1)  = " << std::bitset<8>(nonstd::rotr(i,1)) << '\n';
-    std::cout << "rotr(i,9)  = " << std::bitset<8>(nonstd::rotr(i,9)) << '\n';
-    std::cout << "rotr(i,-1) = " << std::bitset<8>(nonstd::rotr(i,-1)) << '\n';
+
+    EXPECT( bin(      i     ) == bin(  i) );
+    EXPECT( bin( rotr(i, 0) ) == bin( 29) );
+    EXPECT( bin( rotr(i, 1) ) == bin(142) );
+    EXPECT( bin( rotr(i, 4) ) == bin(209) );
+    EXPECT( bin( rotr(i, 9) ) == bin(142) );
+    EXPECT( bin( rotr(i,-1) ) == bin( 58) );
+
 }
 
-CASE( "countl_zero(): implement" )
+CASE( "countl_zero(): the number of consecutive 0 bits in the value of x, starting from the most significant bit" " [bit.count]" )
 {
-    EXPECT( !!"countl_zero(): implement" );
+    typedef unsigned char uint8_t;
 
-    typedef unsigned char type;
-    type table[] = { 0u, 255u, 28u };
-
-    for ( int i = 0; i < 3; ++i )
-    {
-        type x = table[i];
-
-        std::cout
-            << "countl_zero(0b" << std::bitset<8>(x) << ") = "
-            << nonstd::countl_zero(x) << '\n';
-    }
+    EXPECT( countl_zero( uint8_t(0x80u) ) == 0 );
+    EXPECT( countl_zero( uint8_t(0x40u) ) == 1 );
+    EXPECT( countl_zero( uint8_t(0x20u) ) == 2 );
+    EXPECT( countl_zero( uint8_t(0x10u) ) == 3 );
+    EXPECT( countl_zero( uint8_t(0x08u) ) == 4 );
+    EXPECT( countl_zero( uint8_t(0x04u) ) == 5 );
+    EXPECT( countl_zero( uint8_t(0x02u) ) == 6 );
+    EXPECT( countl_zero( uint8_t(0x01u) ) == 7 );
+    EXPECT( countl_zero( uint8_t(   0u) ) == 8 );
 }
 
-CASE( "countl_one(): implement" )
+CASE( "countl_one(): the number of consecutive 1 bits in the value of x, starting from the most significant bit" " [bit.count]" )
 {
-    EXPECT( !!"countl_one(): implement" );
+    typedef unsigned char uint8_t;
 
-    typedef unsigned char type;
-    type table[] = { 0u, 255u, 227u };
-
-    for ( int i = 0; i < 3; ++i )
-    {
-        type x = table[i];
-        std::cout
-            << "countl_one(0b" << std::bitset<8>(x) << ") = "
-            << nonstd::countl_one(x) << '\n';
-    }
+    EXPECT( countl_one( uint8_t(0x00u) ) == 0 );
+    EXPECT( countl_one( uint8_t(0x80u) ) == 1 );
+    EXPECT( countl_one( uint8_t(0xc0u) ) == 2 );
+    EXPECT( countl_one( uint8_t(0xe0u) ) == 3 );
+    EXPECT( countl_one( uint8_t(0xf0u) ) == 4 );
+    EXPECT( countl_one( uint8_t(0xf8u) ) == 5 );
+    EXPECT( countl_one( uint8_t(0xfcu) ) == 6 );
+    EXPECT( countl_one( uint8_t(0xfeu) ) == 7 );
+    EXPECT( countl_one( uint8_t(0xffu) ) == 8 );
 }
 
-CASE( "countr_zero(): implement" )
+CASE( "countr_zero(): the number of consecutive 0 bits in the value of x, starting from the least significant bit" " [bit.count]" )
 {
-    EXPECT( !!"countr_zero(): implement" );
+    typedef unsigned char uint8_t;
 
-    typedef unsigned char type;
-    type table[] = { 0u, 255u, 28u };
-
-    for ( int i = 0; i < 3; ++i )
-    {
-        type x = table[i];
-
-        std::cout
-            << "countr_zero(0b" << std::bitset<8>(x) << ") = "
-            << nonstd::countr_zero(x) << '\n';
-    }
+    EXPECT( countr_zero( uint8_t(0x01u) ) == 0 );
+    EXPECT( countr_zero( uint8_t(0x02u) ) == 1 );
+    EXPECT( countr_zero( uint8_t(0x04u) ) == 2 );
+    EXPECT( countr_zero( uint8_t(0x08u) ) == 3 );
+    EXPECT( countr_zero( uint8_t(0x10u) ) == 4 );
+    EXPECT( countr_zero( uint8_t(0x20u) ) == 5 );
+    EXPECT( countr_zero( uint8_t(0x40u) ) == 6 );
+    EXPECT( countr_zero( uint8_t(0x80u) ) == 7 );
+    EXPECT( countr_zero( uint8_t(   0u) ) == 8 );
 }
 
-CASE( "countr_one(): implement" )
+CASE( "countr_one(): the number of consecutive 1 bits in the value of x, starting from the least significant bit" " [bit.count]" )
 {
-    EXPECT( !!"countr_one(): implement" );
+    typedef unsigned char uint8_t;
 
-    // for (std::uint8_t i : { 0, 0b11111111, 0b11100011 })
-
-    typedef unsigned char type;
-    type table[] = { 0u, 255u, 227u };
-
-    for ( int i = 0; i < 3; ++i )
-    {
-        type x = table[i];
-
-        std::cout
-            << "countr_one(0b" << std::bitset<8>(x) << ") = "
-            << nonstd::countr_one(x) << '\n';
-    }
+    EXPECT( countr_one( uint8_t(0x00u) ) == 0 );
+    EXPECT( countr_one( uint8_t(0x01u) ) == 1 );
+    EXPECT( countr_one( uint8_t(0x03u) ) == 2 );
+    EXPECT( countr_one( uint8_t(0x07u) ) == 3 );
+    EXPECT( countr_one( uint8_t(0x0fu) ) == 4 );
+    EXPECT( countr_one( uint8_t(0x1fu) ) == 5 );
+    EXPECT( countr_one( uint8_t(0x3fu) ) == 6 );
+    EXPECT( countr_one( uint8_t(0x7fu) ) == 7 );
+    EXPECT( countr_one( uint8_t(0xffu) ) == 8 );
 }
 
-CASE( "popcount(): implement" )
+CASE( "popcount(): the number of 1 bits in the value of x" " [bit.count]" )
 {
-    EXPECT( !!"popcount(): implement" );
+    typedef unsigned char uint8_t;
 
-    // for (std::uint8_t i : { 0, 0b11111111, 0b00011101 })
-
-    typedef unsigned char type;
-    type table[] = { 0u, 255u, 29u };
-
-    for ( int i = 0; i < 3; ++i )
-    {
-        type x = table[i];
-
-        std::cout
-            << "popcount(0b" << std::bitset<8>(x) << ") = "
-            << nonstd::popcount(x) << '\n';
-    }
+    EXPECT( popcount( uint8_t(0x00u) ) == 0 );
+    EXPECT( popcount( uint8_t(0x01u) ) == 1 );
+    EXPECT( popcount( uint8_t(0x81u) ) == 2 );
+    EXPECT( popcount( uint8_t(0x83u) ) == 3 );
+    EXPECT( popcount( uint8_t(0xc3u) ) == 4 );
+    EXPECT( popcount( uint8_t(0xc7u) ) == 5 );
+    EXPECT( popcount( uint8_t(0xe7u) ) == 6 );
+    EXPECT( popcount( uint8_t(0xefu) ) == 7 );
+    EXPECT( popcount( uint8_t(0xffu) ) == 8 );
 }
 
-CASE( "endian: little differs from big (corner-case when all scalars have size of 1 byte)" )
+CASE( "endian: little differs from big (corner-case when all scalars have size of 1 byte)" " [bit.endian]" )
 {
     EXPECT( nonstd::endian::little != nonstd::endian::big );
 }
@@ -289,7 +267,7 @@ CASE( "endian: little differs from big (corner-case when all scalars have size o
 // Extensions: endian conversions
 //
 
-CASE( "to_big_endian(): [extension]" )
+CASE( "to_big_endian(): " " [bit.endian.extension]" )
 {
 #if bit_USES_STD_BIT
     EXPECT( !!"Extension to_big_endian() not available (bit_USES_STD_BIT)" );
@@ -302,7 +280,7 @@ CASE( "to_big_endian(): [extension]" )
 #endif
 }
 
-CASE( "to_little_endian(): [extension]" )
+CASE( "to_little_endian(): " " [bit.endian.extension]" )
 {
 #if bit_USES_STD_BIT
     EXPECT( !!"Extension to_little_endian() not available (bit_USES_STD_BIT)" );
@@ -315,7 +293,7 @@ CASE( "to_little_endian(): [extension]" )
 #endif
 }
 
-CASE( "to_native_endian(): [extension]" )
+CASE( "to_native_endian(): " " [bit.endian.extension]" )
 {
 #if bit_USES_STD_BIT
     EXPECT( !!"Extension to_native_endian() not available (bit_USES_STD_BIT)" );
@@ -328,7 +306,7 @@ CASE( "to_native_endian(): [extension]" )
 #endif
 }
 
-CASE( "as_big_endian(): [extension]" )
+CASE( "as_big_endian(): " " [bit.endian.extension]" )
 {
 #if bit_USES_STD_BIT
     EXPECT( !!"Extension as_big_endian() not available (bit_USES_STD_BIT)" );
@@ -339,7 +317,7 @@ CASE( "as_big_endian(): [extension]" )
 #endif
 }
 
-CASE( "as_little_endian(): [extension]" )
+CASE( "as_little_endian(): " " [bit.endian.extension]" )
 {
 #if bit_USES_STD_BIT
     EXPECT( !!"Extension as_little_endian() not available (bit_USES_STD_BIT)" );
@@ -350,7 +328,7 @@ CASE( "as_little_endian(): [extension]" )
 #endif
 }
 
-CASE( "as_native_endian(): [extension]" )
+CASE( "as_native_endian(): " " [bit.endian.extension]" )
 {
 #if bit_USES_STD_BIT
     EXPECT( !!"Extension as_native_endian() not available (bit_USES_STD_BIT)" );
