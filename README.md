@@ -137,8 +137,9 @@ TBD
 - [p0476 - Bit-casting object representations](https://wg21.link/P0476). JF Bastien. 2017.
 - [p0553 - Bit operations](https://wg21.link/P0553). Jens Maurer. 2019.
 
-Appendix
---------
+## Appendix
+
+The [test program](test/bit.t.cpp) provides information on the compiler, the C++ language and library capabilities and the tests performed.
 
 ### A.1 Compile-time information
 
