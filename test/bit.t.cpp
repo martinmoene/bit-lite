@@ -115,86 +115,86 @@ CASE( "has_single_bit(): single bit yields false for mutiple bits set" " [bit.po
 
 #include <bitset>
 
+// avoid ambiguous overload resolution for VS2010 (VC10):
+
+template< typename T >
+std::bitset<8> bin( T v )
+{
+#if defined( _MSC_VER ) && _MSC_VER <= 1600
+    return std::bitset<8>( static_cast<int>(v) );
+#else
+    return std::bitset<8>( v );
+#endif
+}
+
 CASE( "bit_ceil(): let N be the smallest power of 2 greater than or equal to x" " [bit.pow.two]" )
 {
-    typedef std::bitset<8> bin;
-
-    EXPECT( bin( 1u ) == bin( bit_ceil( 0u ) ) );
-    EXPECT( bin( 1u ) == bin( bit_ceil( 1u ) ) );
-    EXPECT( bin( 2u ) == bin( bit_ceil( 2u ) ) );
-    EXPECT( bin( 4u ) == bin( bit_ceil( 3u ) ) );
-    EXPECT( bin( 4u ) == bin( bit_ceil( 4u ) ) );
-    EXPECT( bin( 8u ) == bin( bit_ceil( 5u ) ) );
-    EXPECT( bin( 8u ) == bin( bit_ceil( 6u ) ) );
-    EXPECT( bin( 8u ) == bin( bit_ceil( 7u ) ) );
-    EXPECT( bin( 8u ) == bin( bit_ceil( 8u ) ) );
-    EXPECT( bin(16u ) == bin( bit_ceil( 9u ) ) );
+    EXPECT( bin( bit_ceil( 0u ) ) == bin( 1u ) );
+    EXPECT( bin( bit_ceil( 1u ) ) == bin( 1u ) );
+    EXPECT( bin( bit_ceil( 2u ) ) == bin( 2u ) );
+    EXPECT( bin( bit_ceil( 3u ) ) == bin( 4u ) );
+    EXPECT( bin( bit_ceil( 4u ) ) == bin( 4u ) );
+    EXPECT( bin( bit_ceil( 5u ) ) == bin( 8u ) );
+    EXPECT( bin( bit_ceil( 6u ) ) == bin( 8u ) );
+    EXPECT( bin( bit_ceil( 7u ) ) == bin( 8u ) );
+    EXPECT( bin( bit_ceil( 8u ) ) == bin( 8u ) );
+    EXPECT( bin( bit_ceil( 9u ) ) == bin(16u ) );
 }
 
 CASE( "bit_floor(): x == 0, 0; otherwise the maximal value y such that has_single_bit(y) is true and y <= x" " [bit.pow.two]" )
 {
-    typedef std::bitset<8> bin;
-
-    EXPECT( bin( 0u ) == bin( bit_floor( 0u ) ) );
-    EXPECT( bin( 1u ) == bin( bit_floor( 1u ) ) );
-    EXPECT( bin( 2u ) == bin( bit_floor( 2u ) ) );
-    EXPECT( bin( 2u ) == bin( bit_floor( 3u ) ) );
-    EXPECT( bin( 4u ) == bin( bit_floor( 4u ) ) );
-    EXPECT( bin( 4u ) == bin( bit_floor( 5u ) ) );
-    EXPECT( bin( 4u ) == bin( bit_floor( 6u ) ) );
-    EXPECT( bin( 4u ) == bin( bit_floor( 7u ) ) );
-    EXPECT( bin( 8u ) == bin( bit_floor( 8u ) ) );
-    EXPECT( bin( 8u ) == bin( bit_floor( 9u ) ) );
+    EXPECT( bin( bit_floor( 0u ) ) == bin( 0u ) );
+    EXPECT( bin( bit_floor( 1u ) ) == bin( 1u ) );
+    EXPECT( bin( bit_floor( 2u ) ) == bin( 2u ) );
+    EXPECT( bin( bit_floor( 3u ) ) == bin( 2u ) );
+    EXPECT( bin( bit_floor( 4u ) ) == bin( 4u ) );
+    EXPECT( bin( bit_floor( 5u ) ) == bin( 4u ) );
+    EXPECT( bin( bit_floor( 6u ) ) == bin( 4u ) );
+    EXPECT( bin( bit_floor( 7u ) ) == bin( 4u ) );
+    EXPECT( bin( bit_floor( 8u ) ) == bin( 8u ) );
+    EXPECT( bin( bit_floor( 9u ) ) == bin( 8u ) );
 }
 
 CASE( "bit_width: x == 0, 0; otherwise one plus the base-2 logarithm of x, with any fractional part discarded" " [bit.pow.two]" )
 {
-    typedef std::bitset<8> bin;
-
-    EXPECT( bit_width( 0u ) == 0 );
-    EXPECT( bit_width( 1u ) == 1 );
-    EXPECT( bit_width( 2u ) == 2 );
-    EXPECT( bit_width( 3u ) == 2 );
-    EXPECT( bit_width( 4u ) == 3 );
-    EXPECT( bit_width( 5u ) == 3 );
-    EXPECT( bit_width( 6u ) == 3 );
-    EXPECT( bit_width( 7u ) == 3 );
-    EXPECT( bit_width( 8u ) == 4 );
+    EXPECT( bit_width( 0u ) == 0u );
+    EXPECT( bit_width( 1u ) == 1u );
+    EXPECT( bit_width( 2u ) == 2u );
+    EXPECT( bit_width( 3u ) == 2u );
+    EXPECT( bit_width( 4u ) == 3u );
+    EXPECT( bit_width( 5u ) == 3u );
+    EXPECT( bit_width( 6u ) == 3u );
+    EXPECT( bit_width( 7u ) == 3u );
+    EXPECT( bit_width( 8u ) == 4u );
 }
 
 CASE( "rotl(): r is 0, x; if r is positive, (x << r) | (x >> (N - r)); if r is negative, rotr(x, -r)" " [bit.rotate]" )
 {
-    typedef std::bitset<8> bin;
-    typedef unsigned char uint8_t;
     uint8_t i = 29; // 0b00011101;
 
-    EXPECT( bin(      i     ) == bin(  i) );
-    EXPECT( bin( rotl(i, 0) ) == bin( 29) );
-    EXPECT( bin( rotl(i, 1) ) == bin( 58) );
-    EXPECT( bin( rotl(i, 4) ) == bin(209) );
-    EXPECT( bin( rotl(i, 9) ) == bin( 58) );
-    EXPECT( bin( rotl(i,-1) ) == bin(142) );
+    EXPECT( bin(      i     ) == bin(  i ) );
+    EXPECT( bin( rotl(i, 0) ) == bin( 29u) );
+    EXPECT( bin( rotl(i, 1) ) == bin( 58u) );
+    EXPECT( bin( rotl(i, 4) ) == bin(209u) );
+    EXPECT( bin( rotl(i, 9) ) == bin( 58u) );
+    EXPECT( bin( rotl(i,-1) ) == bin(142u) );
 }
 
 CASE( "rotr(): r is 0, x; if r is positive, (x >> r) | (x << (N - r)); if r is negative, rotl(x, -r)" " [bit.rotate]" )
 {
-    typedef std::bitset<8> bin;
-    typedef unsigned char uint8_t;
     uint8_t i = 29; // 0b00011101;
 
-    EXPECT( bin(      i     ) == bin(  i) );
-    EXPECT( bin( rotr(i, 0) ) == bin( 29) );
-    EXPECT( bin( rotr(i, 1) ) == bin(142) );
-    EXPECT( bin( rotr(i, 4) ) == bin(209) );
-    EXPECT( bin( rotr(i, 9) ) == bin(142) );
-    EXPECT( bin( rotr(i,-1) ) == bin( 58) );
+    EXPECT( bin(      i     ) == bin(  i ) );
+    EXPECT( bin( rotr(i, 0) ) == bin( 29u) );
+    EXPECT( bin( rotr(i, 1) ) == bin(142u) );
+    EXPECT( bin( rotr(i, 4) ) == bin(209u) );
+    EXPECT( bin( rotr(i, 9) ) == bin(142u) );
+    EXPECT( bin( rotr(i,-1) ) == bin( 58u) );
 
 }
 
 CASE( "countl_zero(): the number of consecutive 0 bits in the value of x, starting from the most significant bit" " [bit.count]" )
 {
-    typedef unsigned char uint8_t;
-
     EXPECT( countl_zero( uint8_t(0x80u) ) == 0 );
     EXPECT( countl_zero( uint8_t(0x40u) ) == 1 );
     EXPECT( countl_zero( uint8_t(0x20u) ) == 2 );
@@ -203,9 +203,13 @@ CASE( "countl_zero(): the number of consecutive 0 bits in the value of x, starti
     EXPECT( countl_zero( uint8_t(0x04u) ) == 5 );
     EXPECT( countl_zero( uint8_t(0x02u) ) == 6 );
     EXPECT( countl_zero( uint8_t(0x01u) ) == 7 );
-    EXPECT( countl_zero( uint8_t(   0u) ) == 8 );
 
-    EXPECT( countl_zero( 0u ) == CHAR_BIT * sizeof(unsigned int) );
+    EXPECT( countl_zero( uint8_t(   0u) ) ==  8 );
+    EXPECT( countl_zero( uint16_t(  0u) ) == 16 );
+    EXPECT( countl_zero( uint32_t(  0u) ) == 32 );
+    EXPECT( countl_zero( uint64_t(  0u) ) == 64 );
+
+    EXPECT( countl_zero( 0u ) == static_cast<int>( CHAR_BIT * sizeof(unsigned) ) );
 }
 
 CASE( "countl_one(): the number of consecutive 1 bits in the value of x, starting from the most significant bit" " [bit.count]" )
@@ -220,7 +224,12 @@ CASE( "countl_one(): the number of consecutive 1 bits in the value of x, startin
     EXPECT( countl_one( uint8_t(0xfeu) ) == 7 );
     EXPECT( countl_one( uint8_t(0xffu) ) == 8 );
 
-    // EXPECT( countl_one( 0u ) == CHAR_BIT * sizeof(unsigned int) );
+    EXPECT( countl_one( uint8_t(   -1) ) ==  8 );
+    EXPECT( countl_one( uint16_t(  -1) ) == 16 );
+    EXPECT( countl_one( uint32_t(  -1) ) == 32 );
+    EXPECT( countl_one( uint64_t(  -1) ) == 64 );
+
+    EXPECT( countl_one( unsigned(-1) ) == static_cast<int>( CHAR_BIT * sizeof(unsigned) ) );
 }
 
 CASE( "countr_zero(): the number of consecutive 0 bits in the value of x, starting from the least significant bit" " [bit.count]" )
@@ -233,9 +242,13 @@ CASE( "countr_zero(): the number of consecutive 0 bits in the value of x, starti
     EXPECT( countr_zero( uint8_t(0x20u) ) == 5 );
     EXPECT( countr_zero( uint8_t(0x40u) ) == 6 );
     EXPECT( countr_zero( uint8_t(0x80u) ) == 7 );
-    EXPECT( countr_zero( uint8_t(   0u) ) == 8 );
 
-    EXPECT( countr_zero( 0u ) == CHAR_BIT * sizeof(unsigned int) );
+    EXPECT( countr_zero( uint8_t(   0u) ) ==  8 );
+    EXPECT( countr_zero( uint16_t(  0u) ) == 16 );
+    EXPECT( countr_zero( uint32_t(  0u) ) == 32 );
+    EXPECT( countr_zero( uint64_t(  0u) ) == 64 );
+
+    EXPECT( countr_zero( 0u ) == static_cast<int>( CHAR_BIT * sizeof(unsigned) ) );
 }
 
 CASE( "countr_one(): the number of consecutive 1 bits in the value of x, starting from the least significant bit" " [bit.count]" )
@@ -249,6 +262,13 @@ CASE( "countr_one(): the number of consecutive 1 bits in the value of x, startin
     EXPECT( countr_one( uint8_t(0x3fu) ) == 6 );
     EXPECT( countr_one( uint8_t(0x7fu) ) == 7 );
     EXPECT( countr_one( uint8_t(0xffu) ) == 8 );
+
+    EXPECT( countr_one( uint8_t(   -1) ) ==  8 );
+    EXPECT( countr_one( uint16_t(  -1) ) == 16 );
+    EXPECT( countr_one( uint32_t(  -1) ) == 32 );
+    EXPECT( countr_one( uint64_t(  -1) ) == 64 );
+
+    EXPECT( countr_one( unsigned(-1) ) == static_cast<int>( CHAR_BIT * sizeof(unsigned) ) );
 }
 
 CASE( "popcount(): the number of 1 bits in the value of x" " [bit.count]" )
@@ -262,6 +282,8 @@ CASE( "popcount(): the number of 1 bits in the value of x" " [bit.count]" )
     EXPECT( popcount( uint8_t(0xe7u) ) == 6 );
     EXPECT( popcount( uint8_t(0xefu) ) == 7 );
     EXPECT( popcount( uint8_t(0xffu) ) == 8 );
+
+    EXPECT( popcount( unsigned(-1) ) == static_cast<int>( CHAR_BIT * sizeof(unsigned) ) );
 }
 
 CASE( "endian: little differs from big (corner-case when all scalars have size of 1 byte)" " [bit.endian]" )
