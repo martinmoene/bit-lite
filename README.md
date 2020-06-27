@@ -84,11 +84,11 @@ Depending on the compiler and C++-standard used, *bit lite* behaves less or more
 | &nbsp;             | **native_endian_type**     | type based on endian::native |
 | &nbsp;             | &nbsp; |&nbsp;|
 | **Free function**  | template&lt;class T><br>T **to_big_endian**(T v) | <br>convert unconditionally |
-| &nbsp;             | template&lt;class T, class EN><br>T **to_big_endian**(T v, EN) | <br>convert if EN is little_endian_type |
+| &nbsp;             | template&lt;class T, class EN><br>T **to_big_endian**(T v, EN) | convert if EN is little_endian_type<br>*EN specifies endianness of v* |
 | &nbsp;             | template&lt;class T><br>T **to_little_endian**(T v) | <br>convert unconditionally |
-| &nbsp;             | template&lt;class T, class EN><br>T **to_little_endian**(T v, EN) | <br>convert if EN is big_endian_type |
+| &nbsp;             | template&lt;class T, class EN><br>T **to_little_endian**(T v, EN) | convert if EN is big_endian_type<br>*EN specifies endianness of v* |
 | &nbsp;             | template&lt;class T><br>T **to_native_endian**(T v) | <br>identity |
-| &nbsp;             | template&lt;class T, class EN><br>T **to_native_endian**(T v, EN) | convert if EN represents<br> non-native endianness |
+| &nbsp;             | template&lt;class T, class EN><br>T **to_native_endian**(T v, EN) | convert if EN represents<br> non-native endianness for v |
 | &nbsp;             | &nbsp; |&nbsp;|
 | &nbsp;             | template&lt;class T><br>T **as_big_endian**(T v) | <br>convert if native is little endian |
 | &nbsp;             | template&lt;class T><br>T **as_little_endian**(T v) | <br>convert if native is big endian |
