@@ -11,7 +11,7 @@ cmake_minimum_required( VERSION 3.5 FATAL_ERROR )
 
 project(
     bit_lite
-    VERSION 0.2.0
+    VERSION 0.1.0
 #   DESCRIPTION "A C++17-like bit, a type-safe container for single values of bit type for C++98, C++11 and later in a single-file header-only library"
 #   HOMEPAGE_URL "https://github.com/martinmoene/bit-lite"
     LANGUAGES CXX )
