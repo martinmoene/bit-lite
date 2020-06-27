@@ -15,9 +15,15 @@
 
 #if bit_CPP11_90
 # include <cstdint>
-    namespace std11 { using std::uint64_t; }
+    using std::uint8_t;
+    using std::uint16_t;
+    using std::uint32_t;
+    using std::uint64_t;
 #else
-    namespace std11 { typedef unsigned long long uint64_t; }
+    typedef unsigned char      uint8_t;
+    typedef unsigned short int uint16_t;
+    typedef unsigned       int uint32_t;
+    typedef unsigned long long uint64_t;
 #endif
 
 #if bit_USES_STD_BIT
@@ -69,9 +75,9 @@ using namespace nonstd;
 
 CASE( "bit_cast<>(): succesfully roundtrips uint64_t via double" " [bit.cast]" )
 {
-    const std11::uint64_t v = 0x3fe9000000000000ull;
+    const uint64_t v = 0x3fe9000000000000ull;
 
-    EXPECT( v == bit_cast<std11::uint64_t>( bit_cast<double>(v) ) );
+    EXPECT( v == bit_cast<uint64_t>( bit_cast<double>(v) ) );
 }
 
 CASE( "has_single_bit(): single bit yields false for no bits set" " [bit.pow.two]" )
@@ -198,12 +204,12 @@ CASE( "countl_zero(): the number of consecutive 0 bits in the value of x, starti
     EXPECT( countl_zero( uint8_t(0x02u) ) == 6 );
     EXPECT( countl_zero( uint8_t(0x01u) ) == 7 );
     EXPECT( countl_zero( uint8_t(   0u) ) == 8 );
+
+    EXPECT( countl_zero( 0u ) == CHAR_BIT * sizeof(unsigned int) );
 }
 
 CASE( "countl_one(): the number of consecutive 1 bits in the value of x, starting from the most significant bit" " [bit.count]" )
 {
-    typedef unsigned char uint8_t;
-
     EXPECT( countl_one( uint8_t(0x00u) ) == 0 );
     EXPECT( countl_one( uint8_t(0x80u) ) == 1 );
     EXPECT( countl_one( uint8_t(0xc0u) ) == 2 );
@@ -213,12 +219,12 @@ CASE( "countl_one(): the number of consecutive 1 bits in the value of x, startin
     EXPECT( countl_one( uint8_t(0xfcu) ) == 6 );
     EXPECT( countl_one( uint8_t(0xfeu) ) == 7 );
     EXPECT( countl_one( uint8_t(0xffu) ) == 8 );
+
+    // EXPECT( countl_one( 0u ) == CHAR_BIT * sizeof(unsigned int) );
 }
 
 CASE( "countr_zero(): the number of consecutive 0 bits in the value of x, starting from the least significant bit" " [bit.count]" )
 {
-    typedef unsigned char uint8_t;
-
     EXPECT( countr_zero( uint8_t(0x01u) ) == 0 );
     EXPECT( countr_zero( uint8_t(0x02u) ) == 1 );
     EXPECT( countr_zero( uint8_t(0x04u) ) == 2 );
@@ -228,12 +234,12 @@ CASE( "countr_zero(): the number of consecutive 0 bits in the value of x, starti
     EXPECT( countr_zero( uint8_t(0x40u) ) == 6 );
     EXPECT( countr_zero( uint8_t(0x80u) ) == 7 );
     EXPECT( countr_zero( uint8_t(   0u) ) == 8 );
+
+    EXPECT( countr_zero( 0u ) == CHAR_BIT * sizeof(unsigned int) );
 }
 
 CASE( "countr_one(): the number of consecutive 1 bits in the value of x, starting from the least significant bit" " [bit.count]" )
 {
-    typedef unsigned char uint8_t;
-
     EXPECT( countr_one( uint8_t(0x00u) ) == 0 );
     EXPECT( countr_one( uint8_t(0x01u) ) == 1 );
     EXPECT( countr_one( uint8_t(0x03u) ) == 2 );
@@ -247,8 +253,6 @@ CASE( "countr_one(): the number of consecutive 1 bits in the value of x, startin
 
 CASE( "popcount(): the number of 1 bits in the value of x" " [bit.count]" )
 {
-    typedef unsigned char uint8_t;
-
     EXPECT( popcount( uint8_t(0x00u) ) == 0 );
     EXPECT( popcount( uint8_t(0x01u) ) == 1 );
     EXPECT( popcount( uint8_t(0x81u) ) == 2 );
@@ -269,76 +273,149 @@ CASE( "endian: little differs from big (corner-case when all scalars have size o
 // Extensions: endian conversions
 //
 
-CASE( "to_big_endian(): " " [bit.endian.extension]" )
+CASE( "to_big_endian(): convert native, or little or big endian specified unsigned to big endian" " [bit.endian.extension]" )
 {
 #if bit_USES_STD_BIT
     EXPECT( !!"Extension to_big_endian() not available (bit_USES_STD_BIT)" );
 #elif bit_CONFIG_STRICT
     EXPECT( !!"Extension to_big_endian() not available (bit_CONFIG_STRICT)" );
 #else
-    std::cout << "to_big_endian(0xabcd) => " << std::showbase << std::hex << to_big_endian(0xabcdU) << std::dec << '\n';
-    std::cout << "to_big_endian(0xabcd, little_endian_type()) => " << std::showbase << std::hex << to_big_endian(0xabcdU, little_endian_type()) << std::dec << '\n';
-    std::cout << "to_big_endian(0xabcd, big_endian_type()) => " << std::showbase << std::hex << to_big_endian(0xabcdU, big_endian_type()) << std::dec << '\n';
-#endif
+    EXPECT( to_big_endian( uint8_t(0x5eu)                       ) == 0x5eu );
+    EXPECT( to_big_endian( uint8_t(0x5eu), little_endian_type() ) == 0x5eu );
+    EXPECT( to_big_endian( uint8_t(0x5eu), big_endian_type()    ) == 0x5eu );
 
+    EXPECT( to_big_endian( uint16_t(0xabcdu)                       ) == 0xcdabu );
+    EXPECT( to_big_endian( uint16_t(0xabcdu), little_endian_type() ) == 0xcdabu );
+    EXPECT( to_big_endian( uint16_t(0xabcdu), big_endian_type()    ) == 0xabcdu );
+
+    EXPECT( to_big_endian( uint32_t(0xabcdu)                       ) == 0xcdab0000u );
+    EXPECT( to_big_endian( uint32_t(0xabcdu), little_endian_type() ) == 0xcdab0000u );
+    EXPECT( to_big_endian( uint32_t(0xabcdu), big_endian_type()    ) == 0xabcdu     );
+#endif
 }
 
-CASE( "to_little_endian(): " " [bit.endian.extension]" )
+CASE( "to_little_endian(): convert native, or little or big endian specified unsigned to little endian" " [bit.endian.extension]" )
 {
 #if bit_USES_STD_BIT
     EXPECT( !!"Extension to_little_endian() not available (bit_USES_STD_BIT)" );
 #elif bit_CONFIG_STRICT
     EXPECT( !!"Extension to_little_endian() not available (bit_CONFIG_STRICT)" );
 #else
-    std::cout << "to_little_endian(0xabcd) => " << std::showbase << std::hex << to_little_endian(0xabcdU) << std::dec << '\n';
-    std::cout << "to_little_endian(0xabcd, little_endian_type()) => " << std::showbase << std::hex << to_little_endian(0xabcdU, little_endian_type()) << std::dec << '\n';
-    std::cout << "to_little_endian(0xabcd, big_endian_type()) => " << std::showbase << std::hex << to_little_endian(0xabcdU, big_endian_type()) << std::dec << '\n';
+    EXPECT( to_little_endian( uint8_t(0x5eu)                       ) == 0x5eu );
+    EXPECT( to_little_endian( uint8_t(0x5eu), little_endian_type() ) == 0x5eu );
+    EXPECT( to_little_endian( uint8_t(0x5eu), big_endian_type()    ) == 0x5eu );
+
+    EXPECT( to_little_endian( uint16_t(0xabcdu)                       ) == 0xcdabu );
+    EXPECT( to_little_endian( uint16_t(0xabcdu), little_endian_type() ) == 0xabcdu );
+    EXPECT( to_little_endian( uint16_t(0xabcdu), big_endian_type()    ) == 0xcdabu );
+
+    EXPECT( to_little_endian( uint32_t(0xabcdu)                       ) == 0xcdab0000u );
+    EXPECT( to_little_endian( uint32_t(0xabcdu), little_endian_type() ) == 0xabcdu     );
+    EXPECT( to_little_endian( uint32_t(0xabcdu), big_endian_type()    ) == 0xcdab0000u );
 #endif
 }
 
-CASE( "to_native_endian(): " " [bit.endian.extension]" )
+CASE( "to_native_endian(): convert native, or little or big endian specified unsigned to native endian" " [bit.endian.extension]" )
 {
 #if bit_USES_STD_BIT
     EXPECT( !!"Extension to_native_endian() not available (bit_USES_STD_BIT)" );
 #elif bit_CONFIG_STRICT
     EXPECT( !!"Extension to_native_endian() not available (bit_CONFIG_STRICT)" );
 #else
-    std::cout << "to_native_endian(0xabcd) => " << std::showbase << std::hex << to_native_endian(0xabcdU) << std::dec << '\n';
-    std::cout << "to_native_endian(0xabcd, little_endian_type()) => " << std::showbase << std::hex << to_native_endian(0xabcdU, little_endian_type()) << std::dec << '\n';
-    std::cout << "to_native_endian(0xabcd, big_endian_type()) => " << std::showbase << std::hex << to_native_endian(0xabcdU, big_endian_type()) << std::dec << '\n';
+    EXPECT( to_native_endian( uint8_t(0x5eu)                       ) == 0x5eu );
+    EXPECT( to_native_endian( uint8_t(0x5eu), little_endian_type() ) == 0x5eu );
+    EXPECT( to_native_endian( uint8_t(0x5eu), big_endian_type()    ) == 0x5eu );
+
+    if (  endian::native == endian::big )
+    {
+        EXPECT( to_native_endian( uint16_t(0xabcdu)                       ) == 0xabcdu );
+        EXPECT( to_native_endian( uint16_t(0xabcdu), little_endian_type() ) == 0xcdabu );
+        EXPECT( to_native_endian( uint16_t(0xabcdu), big_endian_type()    ) == 0xabcdu );
+
+        EXPECT( to_native_endian( uint32_t(0xabcdu)                       ) == 0xcdab0000u );
+        EXPECT( to_native_endian( uint32_t(0xabcdu), little_endian_type() ) == 0xcdab0000u );
+        EXPECT( to_native_endian( uint32_t(0xabcdu), big_endian_type()    ) == 0xabcdu     );
+    }
+    else if (  endian::native == endian::little )
+    {
+        EXPECT( to_native_endian( uint16_t(0xabcdu)                       ) == 0xabcdu );
+        EXPECT( to_native_endian( uint16_t(0xabcdu), little_endian_type() ) == 0xabcdu );
+        EXPECT( to_native_endian( uint16_t(0xabcdu), big_endian_type()    ) == 0xcdabu );
+
+        EXPECT( to_native_endian( uint32_t(0xabcdu)                       ) == 0xabcdu     );
+        EXPECT( to_native_endian( uint32_t(0xabcdu), little_endian_type() ) == 0xabcdu     );
+        EXPECT( to_native_endian( uint32_t(0xabcdu), big_endian_type()    ) == 0xcdab0000u );
+    }
+    else
+    {
+        EXPECT( !!"endian::native is big nor little" );
+    }
+
 #endif
 }
 
-CASE( "as_big_endian(): " " [bit.endian.extension]" )
+CASE( "as_big_endian(): provide native unsigned as big endian" " [bit.endian.extension]" )
 {
 #if bit_USES_STD_BIT
     EXPECT( !!"Extension as_big_endian() not available (bit_USES_STD_BIT)" );
 #elif bit_CONFIG_STRICT
     EXPECT( !!"Extension as_big_endian() not available (bit_CONFIG_STRICT)" );
 #else
-    std::cout << "as_big_endian(0xabcd) => " << std::showbase << std::hex << as_big_endian(0xabcdU) << std::dec << '\n';
+    if (  endian::native == endian::big )
+    {
+        EXPECT( as_big_endian( uint8_t (0x5eu )  ) == 0x5eu );
+        EXPECT( as_big_endian( uint16_t(0xabcdu) ) == 0xabcdu );
+        EXPECT( as_big_endian( uint32_t(0xabcdu) ) == 0xabcdu );
+    }
+    else if (  endian::native == endian::little )
+    {
+        EXPECT( as_big_endian( uint8_t (0x5eu )  ) == 0x5eu );
+        EXPECT( as_big_endian( uint16_t(0xabcdu) ) == 0xcdabu );
+        EXPECT( as_big_endian( uint32_t(0xabcdu) ) == 0xcdab0000u );
+    }
+    else
+    {
+        EXPECT( !!"endian::native is big nor little" );
+    }
 #endif
 }
 
-CASE( "as_little_endian(): " " [bit.endian.extension]" )
+CASE( "as_little_endian(): provide native unsigned as little endian" " [bit.endian.extension]" )
 {
 #if bit_USES_STD_BIT
     EXPECT( !!"Extension as_little_endian() not available (bit_USES_STD_BIT)" );
 #elif bit_CONFIG_STRICT
     EXPECT( !!"Extension as_little_endian() not available (bit_CONFIG_STRICT)" );
 #else
-    std::cout << "as_little_endian(0xabcd) => " << std::showbase << std::hex << as_little_endian(0xabcdU) << std::dec << '\n';
+    if (  endian::native == endian::big )
+    {
+        EXPECT( as_little_endian( uint8_t (0x5eu )  ) == 0x5eu );
+        EXPECT( as_little_endian( uint16_t(0xabcdu) ) == 0xcdabu );
+        EXPECT( as_little_endian( uint32_t(0xabcdu) ) == 0xcdab0000u );
+    }
+    else if (  endian::native == endian::little )
+    {
+        EXPECT( as_little_endian( uint8_t (0x5eu )  ) == 0x5eu );
+        EXPECT( as_little_endian( uint16_t(0xabcdu) ) == 0xabcdu );
+        EXPECT( as_little_endian( uint32_t(0xabcdu) ) == 0xabcdu );
+    }
+    else
+    {
+        EXPECT( !!"endian::native is big nor little" );
+    }
 #endif
 }
 
-CASE( "as_native_endian(): " " [bit.endian.extension]" )
+CASE( "as_native_endian(): provide native unsigned as native endian (identity)" " [bit.endian.extension]" )
 {
 #if bit_USES_STD_BIT
     EXPECT( !!"Extension as_native_endian() not available (bit_USES_STD_BIT)" );
 #elif bit_CONFIG_STRICT
     EXPECT( !!"Extension as_native_endian() not available (bit_CONFIG_STRICT)" );
 #else
-    std::cout << "as_native_endian(0xabcd) => " << std::showbase << std::hex << as_native_endian(0xabcdU) << std::dec << '\n';
+        EXPECT( as_native_endian( uint8_t (0x5eu )  ) == 0x5eu );
+        EXPECT( as_native_endian( uint16_t(0xabcdu) ) == 0xabcdu );
+        EXPECT( as_native_endian( uint32_t(0xabcdu) ) == 0xabcdu );
 #endif
 }
 

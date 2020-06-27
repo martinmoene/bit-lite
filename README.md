@@ -148,24 +148,25 @@ The version of *bit lite* is available via tag `[.version]`. The following tags 
 ### A.2 Bit lite test specification
 
 ```Text
-bit_cast<>(): ...
-has_single_bit(): single bit yields true for single bits set
-has_single_bit(): single bit yields false for mutiple bits set
-bit_ceil(): implement
-bit_floor(): implement
-bit_width: implement
-rotl(): implement
-rotr(): implement
-countl_zero(): implement
-countl_one(): implement
-countr_zero(): implement
-countr_one(): implement
-popcount(): implement
-endian: little differs from big (corner-case when all scalars have size of 1 byte)
-to_big_endian(): [extension]
-to_little_endian(): [extension]
-to_native_endian(): [extension]
-as_big_endian(): [extension]
-as_little_endian(): [extension]
-as_native_endian(): [extension]
+bit_cast<>(): succesfully roundtrips uint64_t via double [bit.cast]
+has_single_bit(): single bit yields false for no bits set [bit.pow.two]
+has_single_bit(): single bit yields true for single bits set [bit.pow.two]
+has_single_bit(): single bit yields false for mutiple bits set [bit.pow.two]
+bit_ceil(): let N be the smallest power of 2 greater than or equal to x [bit.pow.two]
+bit_floor(): x == 0, 0; otherwise the maximal value y such that has_single_bit(y) is true and y <= x [bit.pow.two]
+bit_width: x == 0, 0; otherwise one plus the base-2 logarithm of x, with any fractional part discarded [bit.pow.two]
+rotl(): r is 0, x; if r is positive, (x << r) | (x >> (N - r)); if r is negative, rotr(x, -r) [bit.rotate]
+rotr(): r is 0, x; if r is positive, (x >> r) | (x << (N - r)); if r is negative, rotl(x, -r) [bit.rotate]
+countl_zero(): the number of consecutive 0 bits in the value of x, starting from the most significant bit [bit.count]
+countl_one(): the number of consecutive 1 bits in the value of x, starting from the most significant bit [bit.count]
+countr_zero(): the number of consecutive 0 bits in the value of x, starting from the least significant bit [bit.count]
+countr_one(): the number of consecutive 1 bits in the value of x, starting from the least significant bit [bit.count]
+popcount(): the number of 1 bits in the value of x [bit.count]
+endian: little differs from big (corner-case when all scalars have size of 1 byte) [bit.endian]
+to_big_endian(): convert native, or little or big endian specified unsigned to big endian [bit.endian.extension]
+to_little_endian(): convert native, or little or big endian specified unsigned to little endian [bit.endian.extension]
+to_native_endian(): convert native, or little or big endian specified unsigned to native endian [bit.endian.extension]
+as_big_endian(): provide native unsigned as big endian [bit.endian.extension]
+as_little_endian(): provide native unsigned as little endian [bit.endian.extension]
+as_native_endian(): provide native unsigned as native endian (identity) [bit.endian.extension]
 ```
