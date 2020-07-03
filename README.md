@@ -53,11 +53,9 @@ Bit width of 0x13: 5
 
 *bit lite* is distributed under the [Boost Software License](https://github.com/martinmoene/bit-lite/blob/master/LICENSE.txt).
 
-
 ## Dependencies
 
 *bit lite* has no other dependencies than the [C++ standard library](http://en.cppreference.com/w/cpp/header).
-
 
 ## Installation
 
@@ -96,17 +94,19 @@ Depending on the compiler and C++-standard used, *bit lite* behaves less or more
 
 ### Configuration
 
+#### Standard selection macro
+
 \-D<b>bit\_CPLUSPLUS</b>=199711L  
 Define this macro to override the auto-detection of the supported C++ standard, if your compiler does not set the `__cplusplus` macro correctly.
 
-### Select C++20 standard `<bit>` or nonstd `<bit>`
+#### Select C++20 standard `<bit>` or nonstd `<bit>`
 
 At default, *bit lite* uses the C++20 standard header `<bit>` if it is available and lets you use it via namespace `nonstd`. You can however override this default and explicitly request to use the standard C++20 header or *bit lite*'s header via the following macros.
 
 -D<b>bit\_CONFIG\_SELECT\_BIT</b>=bit_BIT_DEFAULT  
 Define this to `bit_BIT_STD` to select C++20 standard header `<bit>`. Define this to `bit_BIT_NONSTD` to select *bit lite*. Default is undefined, which has the same effect as defining to `bit_BIT_DEFAULT`.
 
-### Strict C++20 mode
+#### Strict C++20 mode
 
 -D<b>bit\_CONFIG\_STRICT</b>=1  
 Define this to `1` to omit the non C++20 standard extensions. Default is undefined, which has the same effect as `0`, non-strict mode.
