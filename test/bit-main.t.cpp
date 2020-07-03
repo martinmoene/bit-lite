@@ -20,7 +20,7 @@ lest::tests & specification()
     return tests;
 }
 
-CASE( "bit-lite version" "[.any][.version]" )
+CASE( "bit-lite version" "[.bit][.version]" )
 {
     bit_PRESENT( bit_lite_MAJOR );
     bit_PRESENT( bit_lite_MINOR );
@@ -28,7 +28,7 @@ CASE( "bit-lite version" "[.any][.version]" )
     bit_PRESENT( bit_lite_VERSION );
 }
 
-CASE( "bit-lite configuration" "[.any][.config]" )
+CASE( "bit-lite configuration" "[.bit][.config]" )
 {
     bit_PRESENT( bit_HAVE_STD_BIT );
     bit_PRESENT( bit_USES_STD_BIT );
@@ -54,7 +54,7 @@ CASE( "__cplusplus" "[.stdc++]" )
 CASE( "Compiler version" "[.compiler]" )
 {
 #if bit_USES_STD_BIT
-    std::cout << "(Compiler version not available: using std::any)\n";
+    std::cout << "(Compiler version not available: using standard <bit>)\n";
 #else
     bit_PRESENT( bit_COMPILER_CLANG_VERSION );
     bit_PRESENT( bit_COMPILER_GNUC_VERSION );
@@ -65,7 +65,7 @@ CASE( "Compiler version" "[.compiler]" )
 CASE( "Presence of C++ language features" "[.stdlanguage]" )
 {
 #if bit_USES_STD_BIT
-    std::cout << "(Presence of C++ language features not available: using std::any)\n";
+    std::cout << "(Presence of C++ language features not available: using standard <bit>)\n";
 #else
 //  bit_PRESENT( bit_HAVE_AUTO );
     // bit_PRESENT( bit_HAVE_NULLPTR );
@@ -87,7 +87,7 @@ CASE( "Presence of C++ language features" "[.stdlanguage]" )
 CASE( "Presence of C++ library features" "[.stdlibrary]" )
 {
 #if bit_USES_STD_BIT
-    std::cout << "(Presence of C++ library features not available: using std::any)\n";
+    std::cout << "(Presence of C++ library features not available: using standard <bit>)\n";
 #else
     bit_PRESENT( bit_HAVE_TYPE_TRAITS );
     bit_PRESENT( bit_HAVE_TR1_TYPE_TRAITS );
