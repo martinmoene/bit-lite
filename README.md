@@ -137,6 +137,10 @@ TBD
 - [p0476 - Bit-casting object representations](https://wg21.link/P0476). JF Bastien. 2017.
 - [p0553 - Bit operations](https://wg21.link/P0553). Jens Maurer. 2019.
 
+*Articles*
+
+- Overload 160. [What is the Strict Aliasing Rule and Why Do We Care?](https://accu.org/journals/overload/28/160/anonymous/). Anonymous. December 2020.
+
 ## Appendix
 
 The [test program](test/bit.t.cpp) provides information on the compiler, the C++ language and library capabilities and the tests performed.
