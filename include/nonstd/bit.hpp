@@ -32,7 +32,7 @@
 # define bit_CONFIG_STRICT  0
 #endif
 
-// C++ language version detection (C++20 is speculative):
+// C++ language version detection (C++23 is speculative):
 // Note: VC14.0/1900 (VS2015) lacks too much from C++14.
 
 #ifndef   bit_CPLUSPLUS
@@ -47,7 +47,8 @@
 #define bit_CPP11_OR_GREATER  ( bit_CPLUSPLUS >= 201103L )
 #define bit_CPP14_OR_GREATER  ( bit_CPLUSPLUS >= 201402L )
 #define bit_CPP17_OR_GREATER  ( bit_CPLUSPLUS >= 201703L )
-#define bit_CPP20_OR_GREATER  ( bit_CPLUSPLUS >= 202000L )
+#define bit_CPP20_OR_GREATER  ( bit_CPLUSPLUS >= 202002L )
+#define bit_CPP23_OR_GREATER  ( bit_CPLUSPLUS >= 202300L )
 
 // Use C++20 std bit operations if available and requested:
 
