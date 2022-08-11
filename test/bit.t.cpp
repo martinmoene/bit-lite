@@ -354,7 +354,7 @@ CASE( "to_native_endian(): convert native, or little or big endian specified uns
         EXPECT( to_native_endian( uint16_t(0xabcdu), little_endian_type() ) == 0xcdabu );
         EXPECT( to_native_endian( uint16_t(0xabcdu), big_endian_type()    ) == 0xabcdu );
 
-        EXPECT( to_native_endian( uint32_t(0xabcdu)                       ) == 0xcdab0000u );
+        EXPECT( to_native_endian( uint32_t(0xabcdu)                       ) == 0xabcdu     );
         EXPECT( to_native_endian( uint32_t(0xabcdu), little_endian_type() ) == 0xcdab0000u );
         EXPECT( to_native_endian( uint32_t(0xabcdu), big_endian_type()    ) == 0xabcdu     );
     }
