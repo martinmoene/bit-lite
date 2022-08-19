@@ -192,9 +192,9 @@ else()
     endif()
 endif()
 
-# with C++17, honour explicit request for std::bit or nonstd::bit:
+# with C++17 and later, honour explicit request for std::bit or nonstd::bit:
 
-if( HAS_CPP17_FLAG )
+if( HAS_CPP17_FLAG OR HAS_CPP20_FLAG )
     set( WHICH bit_BIT_DEFAULT )
 
     if( BIT_LITE_OPT_SELECT_STD )
@@ -203,7 +203,15 @@ if( HAS_CPP17_FLAG )
         set( WHICH bit_BIT_NONSTD )
     endif()
 
-    target_compile_definitions( ${PROGRAM}-cpp17.t PRIVATE bit_CONFIG_SELECT_BIT=${WHICH} )
+    message( STATUS "Subproject '${PROJECT_NAME}', C++17 and later using '${WHICH}'")
+
+    if( HAS_CPP17_FLAG )
+        target_compile_definitions( ${PROGRAM}-cpp17.t PRIVATE bit_CONFIG_SELECT_BIT=${WHICH} )
+    endif()
+
+    if( HAS_CPP20_FLAG )
+        target_compile_definitions( ${PROGRAM}-cpp20.t PRIVATE bit_CONFIG_SELECT_BIT=${WHICH} )
+    endif()
 
     if( HAS_CPPLATEST_FLAG )
         target_compile_definitions( ${PROGRAM}-cpplatest.t PRIVATE bit_CONFIG_SELECT_BIT=${WHICH} )
