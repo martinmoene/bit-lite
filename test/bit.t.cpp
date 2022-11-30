@@ -73,7 +73,7 @@ using namespace nonstd;
 
 #define no_constexpr /*constexpr*/
 
-CASE( "bit_cast<>(): succesfully roundtrips uint64_t via double" " [bit.cast]" )
+CASE( "bit_cast<>(): successfully roundtrips uint64_t via double" " [bit.cast]" )
 {
     const uint64_t v = 0x3fe9000000000000ull;
 
@@ -97,7 +97,7 @@ CASE( "has_single_bit(): single bit yields true for single bits set" " [bit.pow.
     }
 }
 
-CASE( "has_single_bit(): single bit yields false for mutiple bits set" " [bit.pow.two]" )
+CASE( "has_single_bit(): single bit yields false for multiple bits set" " [bit.pow.two]" )
 {
     typedef unsigned long type;
     const int N = CHAR_BIT * sizeof(type);
