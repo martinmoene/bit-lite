@@ -256,7 +256,7 @@ namespace nonstd
 # define bit_ENABLE_IF_R_(R, VA)  R
 #endif
 
-// Method enabling (funtion template argument):
+// Method enabling (function template argument):
 
 #if bit_HAVE( TYPE_TRAITS ) && bit_HAVE( DEFAULT_FUNCTION_TEMPLATE_ARG )
 // VS 2013 seems to have trouble with SFINAE for default non-type arguments:
@@ -332,7 +332,7 @@ typedef integral_constant< bool, false > false_type;
     template< class T, class U > struct is_same : std11::true_type{};
 #endif
 
-} // namepsace std11
+} // namespace std11
 
 // C++20 emulation:
 
@@ -341,7 +341,7 @@ namespace std20 {
 template< class T, class U >
 struct same_as : std11::integral_constant<bool, std11::is_same<T,U>::value && std11::is_same<U,T>::value> {};
 
-} // namepsace std20
+} // namespace std20
 
 //
 // For reference:

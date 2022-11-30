@@ -152,10 +152,10 @@ The version of *bit lite* is available via tag `[.version]`. The following tags 
 ### A.2 Bit lite test specification
 
 ```Text
-bit_cast<>(): succesfully roundtrips uint64_t via double [bit.cast]
+bit_cast<>(): successfully roundtrips uint64_t via double [bit.cast]
 has_single_bit(): single bit yields false for no bits set [bit.pow.two]
 has_single_bit(): single bit yields true for single bits set [bit.pow.two]
-has_single_bit(): single bit yields false for mutiple bits set [bit.pow.two]
+has_single_bit(): single bit yields false for multiple bits set [bit.pow.two]
 bit_ceil(): let N be the smallest power of 2 greater than or equal to x [bit.pow.two]
 bit_floor(): x == 0, 0; otherwise the maximal value y such that has_single_bit(y) is true and y <= x [bit.pow.two]
 bit_width: x == 0, 0; otherwise one plus the base-2 logarithm of x, with any fractional part discarded [bit.pow.two]
