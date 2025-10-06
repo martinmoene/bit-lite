@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2020-2020 Martin Moene
+// Copyright (c) 2020-2025 Martin Moene
 //
 // https://github.com/martinmoene/bit-lite
 //
@@ -23,7 +23,9 @@
     typedef unsigned char      uint8_t;
     typedef unsigned short int uint16_t;
     typedef unsigned       int uint32_t;
+# if bit_CPP11_OR_GREATER
     typedef unsigned long long uint64_t;
+# endif
 #endif
 
 #if bit_USES_STD_BIT
@@ -75,9 +77,27 @@ using namespace nonstd;
 
 CASE( "bit_cast<>(): successfully roundtrips uint64_t via double" " [bit.cast]" )
 {
+#if bit_CPP11_OR_GREATER
     const uint64_t v = 0x3fe9000000000000ull;
 
     EXPECT( v == bit_cast<uint64_t>( bit_cast<double>(v) ) );
+#else
+    EXPECT("bit_cast<>(): uint64_t is not available (no C++11)");
+#endif
+}
+
+CASE( "byteswap(): allow to swap bytes in 1, 2, 4, 8-byte integrals" " [bit.byteswap]" )
+{
+#if bit_HAVE_BYTESWAP
+    EXPECT( byteswap( uint8_t (0x12u)                 ) ==  uint8_t (0x12u  )                );
+    EXPECT( byteswap( uint16_t(0x1234u)               ) ==  uint16_t(0x3412u)                );
+    EXPECT( byteswap( uint32_t(0x12345678ul)          ) ==  uint32_t(0x78563412ul)           );
+#if bit_CPP11_OR_GREATER
+    EXPECT( byteswap( uint64_t(0x12345678AABBCCDDull) ) ==  uint64_t(0xDDCCBBAA78563412ull ) );
+#endif
+#else
+    EXPECT("byteswap: not available (using std::byteswap and not C++23 or later)");
+#endif
 }
 
 CASE( "has_single_bit(): single bit yields false for no bits set" " [bit.pow.two]" )
@@ -155,7 +175,7 @@ CASE( "bit_floor(): x == 0, 0; otherwise the maximal value y such that has_singl
     EXPECT( bin( bit_floor( 9u ) ) == bin( 8u ) );
 }
 
-CASE( "bit_width: x == 0, 0; otherwise one plus the base-2 logarithm of x, with any fractional part discarded" " [bit.pow.two]" )
+CASE( "bit_width(): x == 0, 0; otherwise one plus the base-2 logarithm of x, with any fractional part discarded" " [bit.pow.two]" )
 {
     EXPECT( bit_width( 0u ) == 0u );
     EXPECT( bit_width( 1u ) == 1u );
@@ -207,8 +227,9 @@ CASE( "countl_zero(): the number of consecutive 0 bits in the value of x, starti
     EXPECT( countl_zero( uint8_t(   0u) ) ==  8 );
     EXPECT( countl_zero( uint16_t(  0u) ) == 16 );
     EXPECT( countl_zero( uint32_t(  0u) ) == 32 );
+#if bit_CPP11_OR_GREATER
     EXPECT( countl_zero( uint64_t(  0u) ) == 64 );
-
+#endif
     EXPECT( countl_zero( 0u ) == static_cast<int>( CHAR_BIT * sizeof(unsigned) ) );
 }
 
@@ -227,8 +248,9 @@ CASE( "countl_one(): the number of consecutive 1 bits in the value of x, startin
     EXPECT( countl_one( uint8_t(   -1) ) ==  8 );
     EXPECT( countl_one( uint16_t(  -1) ) == 16 );
     EXPECT( countl_one( uint32_t(  -1) ) == 32 );
+#if bit_CPP11_OR_GREATER
     EXPECT( countl_one( uint64_t(  -1) ) == 64 );
-
+#endif
     EXPECT( countl_one( unsigned(-1) ) == static_cast<int>( CHAR_BIT * sizeof(unsigned) ) );
 }
 
@@ -246,8 +268,9 @@ CASE( "countr_zero(): the number of consecutive 0 bits in the value of x, starti
     EXPECT( countr_zero( uint8_t(   0u) ) ==  8 );
     EXPECT( countr_zero( uint16_t(  0u) ) == 16 );
     EXPECT( countr_zero( uint32_t(  0u) ) == 32 );
+#if bit_CPP11_OR_GREATER
     EXPECT( countr_zero( uint64_t(  0u) ) == 64 );
-
+#endif
     EXPECT( countr_zero( 0u ) == static_cast<int>( CHAR_BIT * sizeof(unsigned) ) );
 }
 
@@ -266,8 +289,9 @@ CASE( "countr_one(): the number of consecutive 1 bits in the value of x, startin
     EXPECT( countr_one( uint8_t(   -1) ) ==  8 );
     EXPECT( countr_one( uint16_t(  -1) ) == 16 );
     EXPECT( countr_one( uint32_t(  -1) ) == 32 );
+#if bit_CPP11_OR_GREATER
     EXPECT( countr_one( uint64_t(  -1) ) == 64 );
-
+#endif
     EXPECT( countr_one( unsigned(-1) ) == static_cast<int>( CHAR_BIT * sizeof(unsigned) ) );
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2020-2020 Martin Moene
+// Copyright (c) 2020-2025 Martin Moene
 //
 // https://github.com/martinmoene/bit-lite
 //
@@ -72,6 +72,13 @@
 
 #include <bit>
 
+#if bit_CPP20_OR_GREATER
+# include <version>
+# define bit_HAVE_BYTESWAP  __cpp_lib_byteswap
+#else
+# define bit_HAVE_BYTESWAP  0
+#endif
+
 namespace nonstd
 {
     using std::bit_cast;
@@ -89,6 +96,10 @@ namespace nonstd
     using std::countr_zero;
     using std::countr_one;
     using std::popcount;
+
+#if bit_HAVE_BYTESWAP || bit_CPP23_OR_GREATER
+    using std::byteswap;
+#endif
 
     using std::endian;
 }
@@ -210,6 +221,10 @@ namespace nonstd
 
 #define bit_HAVE_NODISCARD              bit_CPP17_000
 
+// Presence of C++23 library features:
+
+#define bit_HAVE_BYTESWAP               1  // self-supplied
+
 // Presence of C++ language features:
 
 #if bit_HAVE_CONSTEXPR_11
@@ -246,6 +261,21 @@ namespace nonstd
 # include <type_traits>
 #elif bit_HAVE_TR1_TYPE_TRAITS
 # include <tr1/type_traits>
+#endif
+
+#ifdef  _MSC_VER
+# include <cstdlib>
+# define bit_byteswap16  _byteswap_ushort
+# define bit_byteswap32  _byteswap_ulong
+# define bit_byteswap64  _byteswap_uint64
+#else
+# define bit_byteswap16  __builtin_bswap16
+# define bit_byteswap32  __builtin_bswap32
+# define bit_byteswap64  __builtin_bswap64
+#endif
+
+#if bit_HAVE( CSTDINT )
+# include <cstdint>
 #endif
 
 // Method enabling (return type):
@@ -289,6 +319,20 @@ bit_constexpr T bitmask( int i )
 // C++11 emulation:
 
 namespace std11 {
+
+#if bit_HAVE( CSTDINT )
+    using std::uint8_t;
+    using std::uint16_t;
+    using std::uint32_t;
+    using std::uint64_t;
+#else
+    typedef unsigned char      uint8_t;
+    typedef unsigned short int uint16_t;
+    typedef unsigned int       uint32_t;
+# if bit_CPP11_OR_GREATER
+    typedef unsigned long long uint64_t;
+# endif
+#endif
 
 template< class T, T v > struct integral_constant { enum { value = v }; };
 typedef integral_constant< bool, true  > true_type;
@@ -353,19 +397,22 @@ struct same_as : std11::integral_constant<bool, std11::is_same<T,U>::value && st
 
 template< class To, class From > constexpr To bit_cast( From const & from ) noexcept;
 
-// 26.5.4, integral powers of 2
+// 26.5.4, byteswap
+template< class T > constexpr T byteswap(T value) noexcept;
+
+// 26.5.5, integral powers of 2
 
 template< class T > constexpr bool has_single_bit(T x) noexcept;
 template< class T > constexpr T bit_ceil(T x);
 template< class T > constexpr T bit_floor(T x) noexcept;
 template< class T > constexpr T bit_width(T x) noexcept;
 
-// 26.5.5, rotating
+// 26.5.6, rotating
 
 template< class T > [[nodiscard]] constexpr T rotl(T x, int s) noexcept;
 template< class T > [[nodiscard]] constexpr T rotr(T x, int s) noexcept;
 
-// 26.5.6, counting
+// 26.5.7, counting
 
 template< class T > constexpr int countl_zero(T x) noexcept;
 template< class T > constexpr int countl_one(T x) noexcept;
@@ -400,7 +447,33 @@ bit_cast( From const & src ) bit_noexcept
     return dst;
 }
 
-// 26.5.5, rotating
+// 26.5.4, byteswap (C++23, p1272)
+
+inline bit_constexpr std11::uint8_t byteswap ( std11::uint8_t value ) bit_noexcept
+{
+    return value;
+}
+
+inline /*bit_constexpr*/ std11::uint16_t byteswap ( std11::uint16_t value ) bit_noexcept
+{
+    return bit_byteswap16( value );
+}
+
+inline /*bit_constexpr*/ std11::uint32_t byteswap ( std11::uint32_t value ) bit_noexcept
+{
+    return bit_byteswap32( value );
+}
+
+#if bit_CPP11_OR_GREATER
+
+inline /*bit_constexpr*/ std11::uint64_t byteswap ( std11::uint64_t value ) bit_noexcept
+{
+    return bit_byteswap64( value );
+}
+
+#endif
+
+// 26.5.6, rotating
 
 // clang 3.5 - 3.8: Infinite recursive template instantiation when using Clang while GCC works fine?
 // https://stackoverflow.com/questions/37931284/infinite-recursive-template-instantiation-when-using-clang-while-gcc-works-fine
@@ -462,7 +535,7 @@ bit_nodiscard bit_constexpr14 T rotr(T x, int s) bit_noexcept
     return rotr_impl( x, s );
 }
 
-// 26.5.6, counting
+// 26.5.7, counting
 
 template< class T
     bit_ENABLE_IF_(
@@ -554,7 +627,7 @@ bit_constexpr14 int popcount(T x) bit_noexcept
     return result;
 }
 
-// 26.5.4, integral powers of 2
+// 26.5.5, integral powers of 2
 
 template< class T
     bit_ENABLE_IF_(
@@ -633,7 +706,7 @@ bit_constexpr T bit_floor(T x) bit_noexcept
         : 0;
 }
 
-// 26.5.7, endian
+// 26.5.8, endian
 
 #if bit_HAVE( ENUM_CLASS )
 
@@ -689,21 +762,6 @@ private:
 
 #if !bit_CONFIG_STRICT
 
-#ifdef  _MSC_VER
-# include <cstdlib>
-# define bit_byteswap16  _byteswap_ushort
-# define bit_byteswap32  _byteswap_ulong
-# define bit_byteswap64  _byteswap_uint64
-#else
-# define bit_byteswap16  __builtin_bswap16
-# define bit_byteswap32  __builtin_bswap32
-# define bit_byteswap64  __builtin_bswap64
-#endif
-
-#if bit_HAVE( CSTDINT )
-# include <cstdint>
-#endif
-
 namespace nonstd {
 namespace bit {
 
@@ -716,26 +774,13 @@ typedef std11::integral_constant<int, static_cast<int>(endian::native)> native_e
 // make sure all unsigned types are covered, see
 // http://ithare.com/c-on-using-int_t-as-overload-and-template-parameters/
 
-namespace std11 {
-
-#if bit_HAVE( CSTDINT )
-    using std::uint8_t;
-    using std::uint16_t;
-    using std::uint32_t;
-    using std::uint64_t;
-#else
-    typedef unsigned char      uint8_t;
-    typedef unsigned short int uint16_t;
-    typedef unsigned int       uint32_t;
-    typedef unsigned long long uint64_t;
-#endif
-} // namespace std11
-
 template< size_t N > struct uint_by_size;
 template<> struct uint_by_size< 8> { typedef std11::uint8_t  type; };
 template<> struct uint_by_size<16> { typedef std11::uint16_t type; };
 template<> struct uint_by_size<32> { typedef std11::uint32_t type; };
+#if bit_CPP11_OR_GREATER
 template<> struct uint_by_size<64> { typedef std11::uint64_t type; };
+#endif
 
 template< typename T >
 struct normalized_uint_type
@@ -766,10 +811,14 @@ inline std11::uint32_t to_big_endian_( std11::uint32_t v, little_endian_type )
     return bit_byteswap32( v );
 }
 
+#if bit_CPP11_OR_GREATER
+
 inline std11::uint64_t to_big_endian_( std11::uint64_t v, little_endian_type )
 {
     return bit_byteswap64( v );
 }
+
+#endif
 
 template< typename T >
 inline T to_big_endian_( T v, big_endian_type )
@@ -794,10 +843,14 @@ inline std11::uint32_t to_little_endian_( std11::uint32_t v, big_endian_type )
     return bit_byteswap32( v );
 }
 
+#if bit_CPP11_OR_GREATER
+
 inline std11::uint64_t to_little_endian_( std11::uint64_t v, big_endian_type )
 {
     return bit_byteswap64( v );
 }
+
+#endif
 
 template< typename T >
 inline T to_little_endian_( T v, little_endian_type )
@@ -908,6 +961,8 @@ namespace nonstd
     using bit::countr_zero;
     using bit::countr_one;
     using bit::popcount;
+
+    using bit::byteswap;
 
     using bit::endian;
 }

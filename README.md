@@ -71,7 +71,7 @@ Bit width of 0x13: 5
 
 ### Documentation of standard header `<bit>`
 
-Depending on the compiler and C++-standard used, *bit lite* behaves less or more like C++20 standard `<bit>`. To get an idea of the capabilities of *bit lite* with your configuration, look at the output of the [tests](test/bit.t.cpp), issuing `bit-main.t --pass @`. For C++20 standard `<bit>`, see its [documentation at cppreference](https://en.cppreference.com/w/cpp/header/bit).  
+Depending on the compiler and C++-standard used, *bit lite* behaves less or more like C++20 standard `<bit>`. To get an idea of the capabilities of *bit lite* with your configuration, look at the output of the [tests](test/bit.t.cpp), issuing `bit-main.t --pass @`. For C++20 standard `<bit>` and its C++23 extension, see its [documentation at cppreference](https://en.cppreference.com/w/cpp/header/bit).  
 
 ### Non-standard extensions
 
@@ -153,12 +153,13 @@ The version of *bit lite* is available via tag `[.version]`. The following tags 
 
 ```Text
 bit_cast<>(): successfully roundtrips uint64_t via double [bit.cast]
+byteswap(): allow to swap bytes in 1, 2, 4, 8-byte integrals [bit.byteswap]
 has_single_bit(): single bit yields false for no bits set [bit.pow.two]
 has_single_bit(): single bit yields true for single bits set [bit.pow.two]
 has_single_bit(): single bit yields false for multiple bits set [bit.pow.two]
 bit_ceil(): let N be the smallest power of 2 greater than or equal to x [bit.pow.two]
 bit_floor(): x == 0, 0; otherwise the maximal value y such that has_single_bit(y) is true and y <= x [bit.pow.two]
-bit_width: x == 0, 0; otherwise one plus the base-2 logarithm of x, with any fractional part discarded [bit.pow.two]
+bit_width(): x == 0, 0; otherwise one plus the base-2 logarithm of x, with any fractional part discarded [bit.pow.two]
 rotl(): r is 0, x; if r is positive, (x << r) | (x >> (N - r)); if r is negative, rotr(x, -r) [bit.rotate]
 rotr(): r is 0, x; if r is positive, (x >> r) | (x << (N - r)); if r is negative, rotl(x, -r) [bit.rotate]
 countl_zero(): the number of consecutive 0 bits in the value of x, starting from the most significant bit [bit.count]

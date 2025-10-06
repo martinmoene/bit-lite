@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2020-2020 Martin Moene
+// Copyright (c) 2020-2025 Martin Moene
 //
 // https://github.com/martinmoene/bit-lite
 //
