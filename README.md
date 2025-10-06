@@ -1,6 +1,6 @@
 # bit-lite - C++20 bit operations for C++98 and later in a single-file header-only library.
 
-[![Language](https://img.shields.io/badge/C%2B%2B-98/11/14/17/20-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-BSL-blue.svg)](https://opensource.org/licenses/BSL-1.0) [![Build Status](https://github.com/martinmoene/bit-lite/actions/workflows/ci.yml/badge.svg)](https://github.com/martinmoene/bit-lite/actions/workflows/ci.yml) [![Version](https://badge.fury.io/gh/martinmoene%2Fbit-lite.svg)](https://github.com/martinmoene/bit-lite/releases) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/bit-lite/master/include/nonstd/bit.hpp) [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://conan.io/center/bit-lite) [![Try it online](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/ZwnY4c9dZUAynUac) [![Try it on godbolt online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://godbolt.org/z/1IPvn7)
+[![Language](https://img.shields.io/badge/C%2B%2B-98/11+-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization) [![License](https://img.shields.io/badge/license-BSL-blue.svg)](https://opensource.org/licenses/BSL-1.0) [![Build Status](https://github.com/martinmoene/bit-lite/actions/workflows/ci.yml/badge.svg)](https://github.com/martinmoene/bit-lite/actions/workflows/ci.yml) [![Version](https://badge.fury.io/gh/martinmoene%2Fbit-lite.svg)](https://github.com/martinmoene/bit-lite/releases) [![download](https://img.shields.io/badge/latest-download-blue.svg)](https://raw.githubusercontent.com/martinmoene/bit-lite/master/include/nonstd/bit.hpp) [![Repology](https://img.shields.io/badge/on-repology-blue.svg)](https://repology.org/projects/?search=bit-lite) [![Conan](https://img.shields.io/badge/on-conan-blue.svg)](https://conan.io/center/bit-lite) [![Try it online](https://img.shields.io/badge/on-wandbox-blue.svg)](https://wandbox.org/permlink/ZwnY4c9dZUAynUac) [![Try it on godbolt online](https://img.shields.io/badge/on-godbolt-blue.svg)](https://godbolt.org/z/1IPvn7)
 
 **Contents**  
 
@@ -43,7 +43,7 @@ Bit width of 0x13: 5
 
 ## In a nutshell
 
-**bit lite** is a single-file header-only library to provide the tools from the C++20 header [`<bit>`](https://en.cppreference.com/w/cpp/header/bit) for use with C++98 and later. If available, the standard header is used, unless [configured](#configuration) otherwise.
+**bit lite** is a single-file header-only library to provide the tools from the C++20/C++23 header [`<bit>`](https://en.cppreference.com/w/cpp/header/bit) for use with C++98 and later. If available, the standard header is used, unless [configured](#configuration) otherwise.
 
 **Features and properties of bit lite** are ease of installation (single header), freedom of dependencies other than the standard library.
 
@@ -71,7 +71,7 @@ Bit width of 0x13: 5
 
 ### Documentation of standard header `<bit>`
 
-Depending on the compiler and C++-standard used, *bit lite* behaves less or more like C++20 standard `<bit>`. To get an idea of the capabilities of *bit lite* with your configuration, look at the output of the [tests](test/bit.t.cpp), issuing `bit-main.t --pass @`. For C++20 standard `<bit>` and its C++23 extension, see its [documentation at cppreference](https://en.cppreference.com/w/cpp/header/bit).  
+Depending on the compiler and C++-standard used, *bit lite* behaves less or more like C++20/C++23 standard `<bit>`. To get an idea of the capabilities of *bit lite* with your configuration, look at the output of the [tests](test/bit.t.cpp), issuing `bit-main.t --pass @`. For C++20 standard `<bit>` and its C++23 extension, see its [documentation at cppreference](https://en.cppreference.com/w/cpp/header/bit).  
 
 ### Non-standard extensions
 
@@ -99,17 +99,17 @@ Depending on the compiler and C++-standard used, *bit lite* behaves less or more
 \-D<b>bit\_CPLUSPLUS</b>=199711L  
 Define this macro to override the auto-detection of the supported C++ standard, if your compiler does not set the `__cplusplus` macro correctly.
 
-#### Select C++20 standard `<bit>` or nonstd `<bit>`
+#### Select C++20/C++23 standard `<bit>` or nonstd `<bit>`
 
-At default, *bit lite* uses the C++20 standard header `<bit>` if it is available and lets you use it via namespace `nonstd`. You can however override this default and explicitly request to use the standard C++20 header or *bit lite*'s header via the following macros.
+At default, *bit lite* uses the C++20/C++23 standard header `<bit>` if it is available and lets you use it via namespace `nonstd`. You can however override this default and explicitly request to use the standard C++20/C++23 header or *bit lite*'s header via the following macros.
 
 -D<b>bit\_CONFIG\_SELECT\_BIT</b>=bit_BIT_DEFAULT  
-Define this to `bit_BIT_STD` to select C++20 standard header `<bit>`. Define this to `bit_BIT_NONSTD` to select *bit lite*. Default is undefined, which has the same effect as defining to `bit_BIT_DEFAULT`.
+Define this to `bit_BIT_STD` to select C++20/C++23 standard header `<bit>`. Define this to `bit_BIT_NONSTD` to select *bit lite*. Default is undefined, which has the same effect as defining to `bit_BIT_DEFAULT`.
 
-#### Strict C++20 mode
+#### Strict C++20/C++23 mode
 
 -D<b>bit\_CONFIG\_STRICT</b>=1  
-Define this to `1` to omit the non C++20 standard extensions. Default is undefined, which has the same effect as `0`, non-strict mode.
+Define this to `1` to omit the non C++20/C++23 standard extensions. Default is undefined, which has the same effect as `0`, non-strict mode.
 
 ## Reported to work with
 
@@ -151,6 +151,10 @@ The version of *bit lite* is available via tag `[.version]`. The following tags 
 
 ### A.2 Bit lite test specification
 
+<details>
+<summary>click to expand</summary>
+<p>
+
 ```Text
 bit_cast<>(): successfully roundtrips uint64_t via double [bit.cast]
 byteswap(): allow to swap bytes in 1, 2, 4, 8-byte integrals [bit.byteswap]
@@ -175,3 +179,6 @@ as_big_endian(): provide native unsigned as big endian [bit.endian.extension]
 as_little_endian(): provide native unsigned as little endian [bit.endian.extension]
 as_native_endian(): provide native unsigned as native endian (identity) [bit.endian.extension]
 ```
+
+</p>
+</details>
