@@ -11,6 +11,10 @@
 #include <climits>      // CHAR_BIT, when bit_USES_STD_BIT
 #include <iostream>
 
+#ifndef  bit_COMPILE_TIME_TEST
+# define bit_COMPILE_TIME_TEST  0
+#endif
+
 #define dimension_of(a)  ( sizeof(a) / sizeof(0[a]) )
 
 #if bit_CPP11_90
@@ -89,10 +93,17 @@ CASE( "bit_cast<>(): successfully roundtrips uint64_t via double" " [bit.cast]" 
 CASE( "byteswap(): allow to swap bytes in 1, 2, 4, 8-byte integrals" " [bit.byteswap]" )
 {
 #if bit_HAVE_BYTESWAP
+#if bit_COMPILE_TIME_TEST
+    EXPECT( byteswap( float   (0x0  )                 ) ==  float   (0x0    )                );
+#endif
+    EXPECT( byteswap( int8_t  (0x12 )                 ) ==  int8_t  (0x12   )                );
     EXPECT( byteswap( uint8_t (0x12u)                 ) ==  uint8_t (0x12u  )                );
+    EXPECT( byteswap( int16_t (0x1234 )               ) ==  int16_t (0x3412 )                );
     EXPECT( byteswap( uint16_t(0x1234u)               ) ==  uint16_t(0x3412u)                );
+    EXPECT( byteswap( int32_t (0x12345678l )          ) ==  uint32_t(0x78563412l )           );
     EXPECT( byteswap( uint32_t(0x12345678ul)          ) ==  uint32_t(0x78563412ul)           );
 #if bit_CPP11_OR_GREATER
+    EXPECT( byteswap( int64_t (0x12345678AABBCCDDll ) ) ==  int64_t (0xDDCCBBAA78563412ll  ) );
     EXPECT( byteswap( uint64_t(0x12345678AABBCCDDull) ) ==  uint64_t(0xDDCCBBAA78563412ull ) );
 #endif
 #else

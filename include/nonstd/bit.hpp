@@ -387,6 +387,31 @@ struct same_as : std11::integral_constant<bool, std11::is_same<T,U>::value && st
 
 } // namespace std20
 
+// Other detail:
+
+// make sure all unsigned types are covered, see
+// http://ithare.com/c-on-using-int_t-as-overload-and-template-parameters/
+
+template< size_t N > struct uint_by_size;
+template<> struct uint_by_size< 8> { typedef std11::uint8_t  type; };
+template<> struct uint_by_size<16> { typedef std11::uint16_t type; };
+template<> struct uint_by_size<32> { typedef std11::uint32_t type; };
+#if bit_CPP11_OR_GREATER
+template<> struct uint_by_size<64> { typedef std11::uint64_t type; };
+#endif
+
+template< typename T >
+struct normalized_uint_type
+{
+    typedef typename uint_by_size< CHAR_BIT * sizeof( T ) >::type type;
+
+#if bit_HAVE( STATIC_ASSERT )
+    static_assert( std::is_integral<T>::value, "integral type required.");
+    static_assert( std11::is_unsigned<type>::value, "unsigned type result expected.");
+    static_assert( sizeof( type ) == sizeof( T ), "size of determined type differs from type derived from.");
+#endif
+};
+
 //
 // For reference:
 //
@@ -449,29 +474,35 @@ bit_cast( From const & src ) bit_noexcept
 
 // 26.5.4, byteswap (C++23, p1272)
 
-inline bit_constexpr std11::uint8_t byteswap ( std11::uint8_t value ) bit_noexcept
+inline bit_constexpr std11::uint8_t byteswap_( std11::uint8_t value ) bit_noexcept
 {
     return value;
 }
 
-inline /*bit_constexpr*/ std11::uint16_t byteswap ( std11::uint16_t value ) bit_noexcept
+inline /*bit_constexpr*/ std11::uint16_t byteswap_( std11::uint16_t value ) bit_noexcept
 {
     return bit_byteswap16( value );
 }
 
-inline /*bit_constexpr*/ std11::uint32_t byteswap ( std11::uint32_t value ) bit_noexcept
+inline /*bit_constexpr*/ std11::uint32_t byteswap_( std11::uint32_t value ) bit_noexcept
 {
     return bit_byteswap32( value );
 }
 
 #if bit_CPP11_OR_GREATER
 
-inline /*bit_constexpr*/ std11::uint64_t byteswap ( std11::uint64_t value ) bit_noexcept
+inline /*bit_constexpr*/ std11::uint64_t byteswap_( std11::uint64_t value ) bit_noexcept
 {
     return bit_byteswap64( value );
 }
 
 #endif
+
+template< typename T >
+inline /*bit_constexpr*/ T byteswap( T v ) bit_noexcept
+{
+    return static_cast<T>( byteswap_( static_cast< typename normalized_uint_type<T>::type >( v ) ) );
+}
 
 // 26.5.6, rotating
 
@@ -770,29 +801,6 @@ namespace bit {
 typedef std11::integral_constant<int, static_cast<int>(endian::big   )> big_endian_type;
 typedef std11::integral_constant<int, static_cast<int>(endian::little)> little_endian_type;
 typedef std11::integral_constant<int, static_cast<int>(endian::native)> native_endian_type;
-
-// make sure all unsigned types are covered, see
-// http://ithare.com/c-on-using-int_t-as-overload-and-template-parameters/
-
-template< size_t N > struct uint_by_size;
-template<> struct uint_by_size< 8> { typedef std11::uint8_t  type; };
-template<> struct uint_by_size<16> { typedef std11::uint16_t type; };
-template<> struct uint_by_size<32> { typedef std11::uint32_t type; };
-#if bit_CPP11_OR_GREATER
-template<> struct uint_by_size<64> { typedef std11::uint64_t type; };
-#endif
-
-template< typename T >
-struct normalized_uint_type
-{
-    typedef typename uint_by_size< CHAR_BIT * sizeof( T ) >::type type;
-
-#if bit_HAVE( STATIC_ASSERT )
-    static_assert( sizeof( type ) == sizeof( T ), "");
-    static_assert( std::is_integral<T>::value, "");
-    static_assert( std11::is_unsigned<type>::value, "");
-#endif
-};
 
 // to big endian (implementation):
 
