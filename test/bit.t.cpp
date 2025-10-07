@@ -33,6 +33,9 @@
 #endif
 
 #if bit_USES_STD_BIT
+
+#define bit_noexcept  noexcept
+
 namespace std {
 #else
 namespace nonstd { namespace bit {
@@ -64,7 +67,7 @@ inline std::ostream & operator<<( std::ostream & os, endian const & e )
 #endif
 
 template< typename T >
-inline T bitmask( int i )
+inline T bitmask( int i ) bit_noexcept
 {
     return static_cast<T>( T(1) << i );
 }
@@ -152,7 +155,7 @@ CASE( "has_single_bit(): single bit yields false for multiple bits set" " [bit.p
 // avoid ambiguous overload resolution for VS2010 (VC10):
 
 template< typename T >
-std::bitset<8> bin( T v )
+std::bitset<8> bin( T v ) bit_noexcept
 {
 #if defined( _MSC_VER ) && _MSC_VER <= 1600
     return std::bitset<8>( static_cast<int>(v) );

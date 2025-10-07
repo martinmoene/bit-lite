@@ -804,24 +804,24 @@ typedef std11::integral_constant<int, static_cast<int>(endian::native)> native_e
 
 // to big endian (implementation):
 
-inline std11::uint8_t to_big_endian_( std11::uint8_t v, little_endian_type )
+inline std11::uint8_t to_big_endian_( std11::uint8_t v, little_endian_type ) bit_noexcept
 {
     return v;
 }
 
-inline std11::uint16_t to_big_endian_( std11::uint16_t v, little_endian_type )
+inline std11::uint16_t to_big_endian_( std11::uint16_t v, little_endian_type ) bit_noexcept
 {
     return bit_byteswap16( v );
 }
 
-inline std11::uint32_t to_big_endian_( std11::uint32_t v, little_endian_type )
+inline std11::uint32_t to_big_endian_( std11::uint32_t v, little_endian_type ) bit_noexcept
 {
     return bit_byteswap32( v );
 }
 
 #if bit_CPP11_OR_GREATER
 
-inline std11::uint64_t to_big_endian_( std11::uint64_t v, little_endian_type )
+inline std11::uint64_t to_big_endian_( std11::uint64_t v, little_endian_type ) bit_noexcept
 {
     return bit_byteswap64( v );
 }
@@ -829,31 +829,31 @@ inline std11::uint64_t to_big_endian_( std11::uint64_t v, little_endian_type )
 #endif
 
 template< typename T >
-inline T to_big_endian_( T v, big_endian_type )
+inline T to_big_endian_( T v, big_endian_type ) bit_noexcept
 {
     return v;
 }
 
 // to little endian (implementation):
 
-inline std11::uint8_t to_little_endian_( std11::uint8_t v, big_endian_type )
+inline std11::uint8_t to_little_endian_( std11::uint8_t v, big_endian_type ) bit_noexcept
 {
     return v;
 }
 
-inline std11::uint16_t to_little_endian_( std11::uint16_t v, big_endian_type )
+inline std11::uint16_t to_little_endian_( std11::uint16_t v, big_endian_type ) bit_noexcept
 {
     return bit_byteswap16( v );
 }
 
-inline std11::uint32_t to_little_endian_( std11::uint32_t v, big_endian_type )
+inline std11::uint32_t to_little_endian_( std11::uint32_t v, big_endian_type ) bit_noexcept
 {
     return bit_byteswap32( v );
 }
 
 #if bit_CPP11_OR_GREATER
 
-inline std11::uint64_t to_little_endian_( std11::uint64_t v, big_endian_type )
+inline std11::uint64_t to_little_endian_( std11::uint64_t v, big_endian_type ) bit_noexcept
 {
     return bit_byteswap64( v );
 }
@@ -861,7 +861,7 @@ inline std11::uint64_t to_little_endian_( std11::uint64_t v, big_endian_type )
 #endif
 
 template< typename T >
-inline T to_little_endian_( T v, little_endian_type )
+inline T to_little_endian_( T v, little_endian_type ) bit_noexcept
 {
     return v;
 }
@@ -869,13 +869,13 @@ inline T to_little_endian_( T v, little_endian_type )
 // to native endian (implementation):
 
 template< typename T >
-inline T to_native_endian_( T v, native_endian_type )
+inline T to_native_endian_( T v, native_endian_type ) bit_noexcept
 {
     return v;
 }
 
 template< typename T, typename EN >
-inline T to_native_endian_( T v, EN )
+inline T to_native_endian_( T v, EN ) bit_noexcept
 {
     // force conversion:
     return to_big_endian_( v, little_endian_type() );
@@ -887,37 +887,37 @@ inline T to_native_endian_( T v, EN )
 //
 
 template< typename T >
-inline T to_big_endian( T v )
+inline T to_big_endian( T v ) bit_noexcept
 {
     return to_big_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), little_endian_type() );
 }
 
 template< typename T, typename EN >
-inline T to_big_endian( T v, EN )
+inline T to_big_endian( T v, EN ) bit_noexcept
 {
     return to_big_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), EN() );
 }
 
 template< typename T >
-inline T to_little_endian( T v )
+inline T to_little_endian( T v ) bit_noexcept
 {
     return to_little_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), big_endian_type() );
 }
 
 template< typename T, typename EN >
-inline T to_little_endian( T v, EN )
+inline T to_little_endian( T v, EN ) bit_noexcept
 {
     return to_little_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), EN() );
 }
 
 template< typename T >
-inline T to_native_endian( T v )
+inline T to_native_endian( T v ) bit_noexcept
 {
     return to_native_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), native_endian_type() );
 }
 
 template< typename T, typename EN >
-inline T to_native_endian( T v, EN )
+inline T to_native_endian( T v, EN ) bit_noexcept
 {
     return to_native_endian_( static_cast< typename normalized_uint_type<T>::type >( v ), EN() );
 }
@@ -927,19 +927,19 @@ inline T to_native_endian( T v, EN )
 //
 
 template< typename T >
-inline T as_big_endian( T v )
+inline T as_big_endian( T v ) bit_noexcept
 {
     return to_big_endian( v, native_endian_type() );
 }
 
 template< typename T >
-inline T as_little_endian( T v )
+inline T as_little_endian( T v ) bit_noexcept
 {
     return to_little_endian( v, native_endian_type() );
 }
 
 template< typename T >
-inline T as_native_endian( T v )
+inline T as_native_endian( T v ) bit_noexcept
 {
     return to_native_endian( v, native_endian_type() );
 }
