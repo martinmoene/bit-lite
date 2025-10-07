@@ -11,7 +11,7 @@ cmake_minimum_required( VERSION 3.15 FATAL_ERROR )
 
 project(
     bit_lite
-    VERSION 1.1.0
+    VERSION 1.2.0
 #   DESCRIPTION "A C++20-like bit, bit operations for C++98 and later in a single-file header-only library.
 #   HOMEPAGE_URL "https://github.com/martinmoene/bit-lite"
     LANGUAGES CXX )

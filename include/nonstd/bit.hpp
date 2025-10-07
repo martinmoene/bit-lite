@@ -10,7 +10,7 @@
 #define NONSTD_BIT_LITE_HPP
 
 #define bit_lite_MAJOR  1
-#define bit_lite_MINOR  1
+#define bit_lite_MINOR  2
 #define bit_lite_PATCH  0
 
 #define bit_lite_VERSION  bit_STRINGIFY(bit_lite_MAJOR) "." bit_STRINGIFY(bit_lite_MINOR) "." bit_STRINGIFY(bit_lite_PATCH)
