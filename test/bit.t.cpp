@@ -102,6 +102,9 @@ CASE( "byteswap(): allow to swap bytes in 1, 2, 4, 8-byte integrals" " [bit.byte
     EXPECT( byteswap( uint16_t(0x1234u)               ) ==  uint16_t(0x3412u)                );
     EXPECT( byteswap( int32_t (0x12345678l )          ) ==  uint32_t(0x78563412l )           );
     EXPECT( byteswap( uint32_t(0x12345678ul)          ) ==  uint32_t(0x78563412ul)           );
+    // involve change of sign:
+    EXPECT( byteswap( int16_t (0x11AA )               ) ==  int16_t (0xAA11 )                );
+    EXPECT( byteswap( int16_t (0xAA11 )               ) ==  int16_t (0x11AA )                );
 #if bit_CPP11_OR_GREATER
     EXPECT( byteswap( int64_t (0x12345678AABBCCDDll ) ) ==  int64_t (0xDDCCBBAA78563412ll  ) );
     EXPECT( byteswap( uint64_t(0x12345678AABBCCDDull) ) ==  uint64_t(0xDDCCBBAA78563412ull ) );
