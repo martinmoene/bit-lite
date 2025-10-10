@@ -136,6 +136,7 @@ TBD
 - [p0463 - endendian, Just endian](https://wg21.link/P0463). Howard E. Hinnant. 2017.
 - [p0476 - Bit-casting object representations](https://wg21.link/P0476). JF Bastien. 2017.
 - [p0553 - Bit operations](https://wg21.link/P0553). Jens Maurer. 2019.
+- [P1272 - Byteswapping for fun\&\&nuf](https://wg21.link/P1272). Isabella Muerte and Corentin Jabot. 2021.
 
 *Articles*
 
